@@ -155,11 +155,11 @@ Policy LewkoWatersAlgorithm(AccessTree* AT, int l, int n) {
 	  cur -> left -> v -> arr[c] = -1;
 
 	  *(cur -> right -> v) = createVector(c + 1);
-	  memcpy(cur -> right -> v -> arr, cur -> v -> arr, cur -> v -> capacity);
+	  memcpy(cur -> right -> v -> arr, cur -> v -> arr, sizeof(int) * (cur->v->capacity));
 	  cur -> right -> v -> arr[c] = 1;
 	  ++c;
 	} else {
-	  memcpy(M[row], cur -> v -> arr, (cur -> v -> capacity) * sizeof(int));
+	  memcpy(M[row], cur -> v -> arr, sizeof(int) * (cur->v->capacity));
 	  rho[row] = cur -> data;
 	  ++row;
 	}
