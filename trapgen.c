@@ -113,18 +113,17 @@ void trapgen(PUB_INFO* epsilon, S* S, AS* S_incline, Ts* ts, Delta* delta, Fakek
     element_init_G1(ts.K12, epsilon.pairing);
 	element_pow_zn(ts.K12, epsilon.g3, t)	// K1,2
     for(int i=0; i<AttributeSetSize; ++i){
-		element_init_G1(ts.K03, epsilon.pairing);
-	    element_init_G1(ts.K13, epsilon.pairing);
-		if(delta.b = 0){
-			epsilon.pub_info_H(&hash, str, size, mpz_get_ui(gamma));
-			element_from_hash(ts.K03, S.hash2pl(S.LS[i]), SHA384_DIGEST_LENGTH);
+		element_init_G1(ts.K03[i], epsilon.pairing);
+	    element_init_G1(ts.K13[i], epsilon.pairing);
+		if(delta.b == 0){
+			epsilon.pub_info_H_2(ts.K03, attribute.attribute_values[S_incline.LS[i]], strlen(attribute.attribute_values[S_incline.LS[i]]), epsilon.g1, epsilon.g2);
 			element_pow_zn(ts.K03, ts.K03, t);	// K0,3,i
-			element_from_hash(ts.K13, S.hash3pl(Spl.LS[i]), SHA384_DIGEST_LENGTH);
+			epsilon.pub_info_H_2(ts.K13, attribute.attribute_values[Spl_incline.LS[i]], strlen(attribute.attribute_values[Spl_incline.LS[i]]), epsilon.g1, epsilon.g3);
 			element_pow_zn(ts.K13, ts.K13, t);	// K1,3,i
 		}else{
-			element_from_hash(ts.K03, S.hash3pl(S.LS[i]), SHA384_DIGEST_LENGTH);
+			epsilon.pub_info_H_2(ts.K03, attribute.attribute_values[S_incline.LS[i]], strlen(attribute.attribute_values[S_incline.LS[i]]), epsilon.g1, epsilon.g3);
 			element_pow_zn(ts.K03, ts.K03, t);	// K0,3,i
-			element_from_hash(ts.K13, S.hash2pl(Spl.LS[i]), SHA384_DIGEST_LENGTH);
+			epsilon.pub_info_H_2(ts.K03, attribute.attribute_values[Spl_incline.LS[i]], strlen(attribute.attribute_values[Spl_incline.LS[i]]), epsilon.g1, epsilon.g2);
 			element_pow_zn(ts.K13, ts.K13, t);	// K1,3,i
 		}
 	}
