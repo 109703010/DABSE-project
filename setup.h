@@ -20,6 +20,8 @@ PUB_INFO epsilon;
 
 typedef struct secret {
     element_t g1_alpha;
+    // add secret key alpha
+    mpz_t alpha;
     void (*H_2_)(element_t, char*, int, element_t);
 } SECRET;
 
@@ -164,6 +166,9 @@ void setup(mpz_t lambda) {
     element_mul_mpz(S.g1_alpha, S.g1_alpha, alpha);
     element_mul_mpz(epsilon.g2_a, epsilon.g2_a, a);
     element_mul_mpz(epsilon.g3_a, epsilon.g3_a, a);
+    // add secret key alpha
+    mpz_init(S.alpha);
+    mpz_init_set(S.alpha, alpha);
 #if defined(DEBUG)
     char str[] = "hello world";
     int size = 12;
