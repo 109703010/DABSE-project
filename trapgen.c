@@ -2,7 +2,6 @@
 #include <gmp.h>
 #include <stdlib.h>
 #include <string.h>
-#include <openssl/sha.h>
 #include <pbc/pbc.h>
 #include <time.h>
 #include "setup.h"
