@@ -157,31 +157,35 @@ void setup(mpz_t lambda) {
     element_pairing(epsilon.e_g1_g1_alpha, gen.g_1, gen.g_1);              // r11 = e(g1, g1)
     element_pairing(epsilon.e_g2_g2_alpha, gen.g_2, gen.g_2);              // r22 = e(g2, g2)
     element_pairing(epsilon.e_g3_g3_alpha, gen.g_3, gen.g_3);              // r11 = e(g1, g1)
-    element_mul_mpz(epsilon.e_g1_g1_alpha, epsilon.e_g1_g1_alpha, alpha);  // r11 = r11^alpha
-    element_mul_mpz(epsilon.e_g2_g2_alpha, epsilon.e_g2_g2_alpha, alpha);  // r22 = r22^alpha
-    element_mul_mpz(epsilon.e_g3_g3_alpha, epsilon.e_g3_g3_alpha, alpha);  // r33 = r33^alpha
+    element_pow_mpz(epsilon.e_g1_g1_alpha, epsilon.e_g1_g1_alpha, alpha);  // r11 = r11^alpha
+    element_pow_mpz(epsilon.e_g2_g2_alpha, epsilon.e_g2_g2_alpha, alpha);  // r22 = r22^alpha
+    element_pow_mpz(epsilon.e_g3_g3_alpha, epsilon.e_g3_g3_alpha, alpha);  // r33 = r33^alpha
     element_init_same_as(S.g1_alpha, gen.g_1);
     element_init_same_as(epsilon.g2_a, gen.g_2);
     element_init_same_as(epsilon.g3_a, gen.g_3);
-    element_mul_mpz(S.g1_alpha, S.g1_alpha, alpha);
-    element_mul_mpz(epsilon.g2_a, epsilon.g2_a, a);
-    element_mul_mpz(epsilon.g3_a, epsilon.g3_a, a);
+    element_pow_mpz(S.g1_alpha, S.g1_alpha, alpha);
+    element_pow_mpz(epsilon.g2_a, epsilon.g2_a, a);
+    element_pow_mpz(epsilon.g3_a, epsilon.g3_a, a);
     // add secret key alpha
     mpz_init(S.alpha);
     mpz_init_set(S.alpha, alpha);
+    // fill the function ptr
+    epsilon.H = pub_info_H;
+    epsilon.H_2 = pub_info_H_2;
+    S.H_2_ = secret_H_2_;
 #if defined(DEBUG)
     char str[] = "hello world";
     int size = 12;
     unsigned char* hash;
-    epsilon.pub_info_H(&hash, str, size, mpz_get_ui(gamma));
+    epsilon.H(&hash, str, size, mpz_get_ui(gamma));
     // 打印哈希值的十六进制表示
     for (int i = 0; i < mpz_get_ui(gamma); i++) {
         printf("%02x", *(hash + i));
     }
     printf("\n");
     element_t hash_g;
-    S.secret_H_2_(hash_g, str, size, gen.g_2);
-    epsilon.pub_info_H_2(hash_g, str, size, gen.g_1, gen.g_2);
+    S.H_2_(hash_g, str, size, gen.g_2);
+    epsilon.H_2(hash_g, str, size, gen.g_1, gen.g_2);
 #endif
 }
 
