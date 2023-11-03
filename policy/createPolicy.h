@@ -1,3 +1,5 @@
+#ifndef CREATE_POLICY_H
+#define CREATE_POLICY_H
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -179,3 +181,4 @@ Policy LewkoWatersAlgorithm(AccessTree* AT, int l, int n) {
   destroyATQueue(&q);
   return (Policy){l, n, M, rho};
 }
+#endif

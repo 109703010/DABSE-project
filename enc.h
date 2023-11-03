@@ -1,3 +1,5 @@
+#ifndef ENC_H
+#define ENC_H
 #include "setup.h"
 #include "policy/createPolicy.h"
 #include "ciphertext/SymmetricCipher.h"
@@ -148,3 +150,4 @@ void Enc(PUB_INFO epsilon, char* message, Policy A, char** T) {
   mpz_clear(s);
   mpz_clear(k);
 }
+#endif
