@@ -8,6 +8,8 @@
 #include "data_structure/int/int_vector.h"
 #include "data_structure/char/char_stack.h"
 
+/*#define DEBUG = 1*/
+
 typedef struct {
   int l, n;
   int** M;
@@ -16,6 +18,7 @@ typedef struct {
 
 Policy convertToPolicy(char* policyStr);
 
+#if defined(DEBUG)
 int main(void) {
   // Convert attribute name into symbols via 'A'+index
   char* attributeName[] = {"Hospital", "Department", "Sex", "Doctor number"};
@@ -45,6 +48,7 @@ int main(void) {
 
   return 0;
 }
+#endif
 
 Policy convertToPolicy(char* policyStr) {
   char* toPostfix(char* policyStr);
