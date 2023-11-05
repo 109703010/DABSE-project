@@ -1,5 +1,9 @@
+#ifndef GET_OMEGA_H
+#define GET_OMEGA_H
 #include <stdio.h>
 #include <stdlib.h>
+
+//#define DEBUG = 1
 
 void print_matrix(int** arr, int m, int n);
 int gcd(int a, int b);
@@ -14,6 +18,7 @@ int* get_indepedent_row(int** arr, int m, int n);
 int* get_omega(int** arr, int* row, int n); // Only 1 or 0 is posisble, -1 means invalid
 int isValidOmega(int* omega);
 
+#if defined(DEBUG)
 int main() {
   int l = 4, n = 4;
   int* arr[l];
@@ -43,6 +48,7 @@ int main() {
   }
   return 0;
 }
+#endif
 
 void print_matrix(int** arr, int m, int n) {
   for(int i = 0; i < m; ++i) {
@@ -224,3 +230,4 @@ int isValidOmega(int* omega) {
   }
   return 1;
 }
+#endif
