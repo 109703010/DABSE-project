@@ -20,15 +20,16 @@ void test(PUB_INFO epsilon, CIPHERTEXT C, Ts ts) {
   char *Is = "ABC"; // = ts.Is;
   C_prime.VALID = 0;
   int* A_prime[C.A.l];
-  for(int i = 0, cur = 0; i < C.A.l; ++i) {
+  int l_prime = 0;
+  for(int i = 0; i < C.A.l; ++i) {
 	for(int j = 0; j < Is_size; ++j) {
 	  if(Is[j] == C.A.rho[i]) {
-		A_prime[cur++] = C.A.M[i];
+		A_prime[l_prime++] = C.A.M[i];
 		break;
 	  }
 	}
   }
-  int* row = get_indepedent_row(A_prime, Is_size, C.A.n);
+  int* row = get_indepedent_row(A_prime, l_prime, C.A.n);
   int* omega = get_omega(A_prime, row, C.A.n);
   if(!isValidOmega(omega)) {
 	return;
