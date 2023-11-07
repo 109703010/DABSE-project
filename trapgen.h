@@ -1,3 +1,5 @@
+#ifndef TRAPGEN_H
+#define TRAPGEN_H
 #include <stdio.h>
 #include <gmp.h>
 #include <stdlib.h>
