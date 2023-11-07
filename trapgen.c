@@ -30,45 +30,52 @@ typedef struct Ts{
 	element_t K15;
 }Ts;
 
+Ts ts;
+
 // AS need to do some research
 typedef struct AS{
 	int LS[AttributeSetSize];
 }AS;
+
+AS S_incline;
 
 typedef struct Delta{
 	int b;
 	element_t U;
 }Delta;
 
+Delta delta;
+
 typedef struct Fakekey{
 	element_t fakekey;
 }Fakekey;
 
-void trapgen(PUB_INFO* epsilon, SECRET* S, AS* S_incline, Ts* ts, Delta* delta, Fakekey* fakekey){
+Fakekey fakekey;
+
+void trapgen(/*PUB_INFO* epsilon, SECRET* S, AS* S_incline,AS* S_incline, Ts* ts, Delta* delta, Fakekey* fakekey*/){
 	// Create, initialize, and seed a new random number generator.
 	gmp_randstate_t state;
-	gmp_randinit_mt(state);
-	gmp_randseed_ui(state, 100000U);
+	gmp_randinit_default(state);
 	// setting
 	srand(time(NULL));
-	delta->b = rand() % 2;
+	delta.b = rand() % 2;
 	mpz_t t, u, beta;
 	mpz_init(t);
 	mpz_init(u);
 	mpz_init(beta);
-	mpz_urandomm(t, state, epsilon->N);
-	mpz_urandomm(u, state, epsilon->N);
-	mpz_urandomm(beta, state, epsilon->N);
+	mpz_urandomm(t, state, epsilon.N);
+	mpz_urandomm(u, state, epsilon.N);
+	mpz_urandomm(beta, state, epsilon.N);
 #if defined(DEBUG)
     gmp_printf("t: %Zd \n", t);
     gmp_printf("u: %Zd \n", u);
     gmp_printf("beta: %Zd \n", beta);
-    gmp_printf("N: %Zd \n", epsilon->N);
+    gmp_printf("N: %Zd \n", epsilon.N);
 #endif
 	// L'
 	AS Spl_incline;
 	for(int i=0; i<AttributeSetSize; ++i){
-		Spl_incline.LS[i] = (S_incline->LS[i] + 1) % attributes[i].num_values;
+		Spl_incline.LS[i] = (S_incline.LS[i] + 1) % attributes[i].num_values;
 #if defined(DEBUG)
     printf("AttributeName: %s \nAttributeSetValue: %s \n", attributes[i].attribute_name, attributes[i].attribute_values[Spl_incline.LS[i]]);
 #endif
@@ -76,63 +83,64 @@ void trapgen(PUB_INFO* epsilon, SECRET* S, AS* S_incline, Ts* ts, Delta* delta, 
 
 	// for calculate
 	element_t g2alpha, g3alpha;
-	element_init_G1(g2alpha, epsilon->pairing_of_G);
-	element_init_G1(g3alpha, epsilon->pairing_of_G);
+	element_init_G1(g2alpha, epsilon.pairing_of_G);
+	element_init_G1(g3alpha, epsilon.pairing_of_G);
 	// need to revise setup for alpha
-	element_pow_mpz(g2alpha, epsilon->g2, S->alpha);
-	element_pow_mpz(g3alpha, epsilon->g3, S->alpha);
+	element_pow_mpz(g2alpha, epsilon.g2, S.alpha);
+	element_pow_mpz(g3alpha, epsilon.g3, S.alpha);
 
-	element_init_G1(ts->K01, epsilon->pairing_of_G);
-	element_pow_mpz(ts->K01, epsilon->g2_a, t);
-	element_mul(ts->K01, ts->K01, g2alpha);	// K0,1
-    element_init_G1(ts->K02, epsilon->pairing_of_G);
-	element_pow_mpz(ts->K02, epsilon->g2, t);	// K0,2
-    element_init_G1(ts->K11, epsilon->pairing_of_G);
-	element_pow_mpz(ts->K11, epsilon->g3_a, t);
-	element_mul(ts->K11, ts->K11, g3alpha);	// K1,1
-    element_init_G1(ts->K12, epsilon->pairing_of_G);
-	element_pow_mpz(ts->K12, epsilon->g3, t);	// K1,2
+	element_init_G1(ts.K01, epsilon.pairing_of_G);
+	element_pow_mpz(ts.K01, epsilon.g2_a, t);
+	element_mul(ts.K01, ts.K01, g2alpha);	// K0,1
+    element_init_G1(ts.K02, epsilon.pairing_of_G);
+	element_pow_mpz(ts.K02, epsilon.g2, t);	// K0,2
+    element_init_G1(ts.K11, epsilon.pairing_of_G);
+	element_pow_mpz(ts.K11, epsilon.g3_a, t);
+	element_mul(ts.K11, ts.K11, g3alpha);	// K1,1
+    element_init_G1(ts.K12, epsilon.pairing_of_G);
+	element_pow_mpz(ts.K12, epsilon.g3, t);	// K1,2
     for(int i=0; i<AttributeSetSize; ++i){
-		element_init_G1(ts->K03[i], epsilon->pairing_of_G);
-	    element_init_G1(ts->K13[i], epsilon->pairing_of_G);
-		if(delta->b == 0){
-			epsilon->H_2(ts->K03[i], attributes[i].attribute_values[S_incline->LS[i]], strlen(attributes[i].attribute_values[S_incline->LS[i]]), epsilon->g1, epsilon->g2);
-			element_pow_mpz(ts->K03[i], ts->K03[i], t);	// K0,3,i
-			epsilon->H_2(ts->K13[i], attributes[i].attribute_values[Spl_incline.LS[i]], strlen(attributes[i].attribute_values[Spl_incline.LS[i]]), epsilon->g1, epsilon->g3);
-			element_pow_mpz(ts->K13[i], ts->K13[i], t);	// K1,3,i
+		element_init_G1(ts.K03[i], epsilon.pairing_of_G);
+	    element_init_G1(ts.K13[i], epsilon.pairing_of_G);
+		if(delta.b == 0){
+			epsilon.H_2(ts.K03[i], attributes[i].attribute_values[S_incline.LS[i]], strlen(attributes[i].attribute_values[S_incline.LS[i]]), epsilon.g1, epsilon.g2);
+			element_pow_mpz(ts.K03[i], ts.K03[i], t);	// K0,3,i
+			epsilon.H_2(ts.K13[i], attributes[i].attribute_values[Spl_incline.LS[i]], strlen(attributes[i].attribute_values[Spl_incline.LS[i]]), epsilon.g1, epsilon.g3);
+			element_pow_mpz(ts.K13[i], ts.K13[i], t);	// K1,3,i
 		}else{
-			epsilon->H_2(ts->K03[i], attributes[i].attribute_values[S_incline->LS[i]], strlen(attributes[i].attribute_values[S_incline->LS[i]]), epsilon->g1, epsilon->g3);
-			element_pow_mpz(ts->K03[i], ts->K03[i], t);	// K0,3,i
-			epsilon->H_2(ts->K03[i], attributes[i].attribute_values[Spl_incline.LS[i]], strlen(attributes[i].attribute_values[Spl_incline.LS[i]]), epsilon->g1, epsilon->g2);
-			element_pow_mpz(ts->K13[i], ts->K13[i], t);	// K1,3,i
+			epsilon.H_2(ts.K03[i], attributes[i].attribute_values[S_incline.LS[i]], strlen(attributes[i].attribute_values[S_incline.LS[i]]), epsilon.g1, epsilon.g3);
+			element_pow_mpz(ts.K03[i], ts.K03[i], t);	// K0,3,i
+			epsilon.H_2(ts.K03[i], attributes[i].attribute_values[Spl_incline.LS[i]], strlen(attributes[i].attribute_values[Spl_incline.LS[i]]), epsilon.g1, epsilon.g2);
+			element_pow_mpz(ts.K13[i], ts.K13[i], t);	// K1,3,i
 		}
 	}
-    element_init_G1(ts->K04, epsilon->pairing_of_G);
-	element_pow_mpz(ts->K04, epsilon->g2, beta);	// K0,4
-    element_init_G1(ts->K05, epsilon->pairing_of_G);
-	element_pow_mpz(ts->K05, epsilon->g2, u);	// K0,5
-    element_init_G1(ts->K14, epsilon->pairing_of_G);
-	element_pow_mpz(ts->K14, epsilon->g3, beta);	// K1,4
-    element_init_G1(ts->K15, epsilon->pairing_of_G);
-	element_pow_mpz(ts->K15, epsilon->g3, u);	// K1,5
+    element_init_G1(ts.K04, epsilon.pairing_of_G);
+	element_pow_mpz(ts.K04, epsilon.g2, beta);	// K0,4
+    element_init_G1(ts.K05, epsilon.pairing_of_G);
+	element_pow_mpz(ts.K05, epsilon.g2, u);	// K0,5
+    element_init_G1(ts.K14, epsilon.pairing_of_G);
+	element_pow_mpz(ts.K14, epsilon.g3, beta);	// K1,4
+    element_init_G1(ts.K15, epsilon.pairing_of_G);
+	element_pow_mpz(ts.K15, epsilon.g3, u);	// K1,5
 
 	// delta U, fakekey
-	element_init_G1(delta->U, epsilon->pairing_of_G);
-	if(delta->b == 0){
-		element_pow_mpz(delta->U, epsilon->g3, beta);
-		element_pow_mpz(fakekey->fakekey, epsilon->g2, beta);
+	element_init_G1(delta.U, epsilon.pairing_of_G);
+	element_init_G1(fakekey.fakekey, epsilon.pairing_of_G);
+	if(delta.b == 0){
+		element_pow_mpz(delta.U, epsilon.g3, beta);
+		element_pow_mpz(fakekey.fakekey, epsilon.g2, beta);
 	}else{
-		element_pow_mpz(delta->U, epsilon->g2, beta);
-		element_pow_mpz(fakekey->fakekey, epsilon->g3, beta);
+		element_pow_mpz(delta.U, epsilon.g2, beta);
+		element_pow_mpz(fakekey.fakekey, epsilon.g3, beta);
 	}
-	element_pow_mpz(delta->U, delta->U, u);
-	element_pow_mpz(fakekey->fakekey, fakekey->fakekey, u);
-	element_mul(delta->U, S->g1_alpha, delta->U);
-	element_mul(fakekey->fakekey, S->g1_alpha, fakekey->fakekey);
+	element_pow_mpz(delta.U, delta.U, u);
+	element_pow_mpz(fakekey.fakekey, fakekey.fakekey, u);
+	element_mul(delta.U, S.g1_alpha, delta.U);
+	element_mul(fakekey.fakekey, S.g1_alpha, fakekey.fakekey);
 
 	// clear gmp state, mpz, element
 	gmp_randclear(state);
-	mpz_clears(t, u, beta);
+	mpz_clears(t, u, beta, NULL);
 	element_clear(g2alpha);
 	element_clear(g3alpha);
 }
@@ -173,6 +181,7 @@ int main() {
     attributes[3].attribute_values[4] = "";  // You can replace this with the default value
     attributes[3].num_values = 5;
 
+#if defined(DEBUG)
     // Printing attribute information
     for (int i = 0; i < 4; i++) {
         printf("Attribute: %s\n", attributes[i].attribute_name);
@@ -181,19 +190,19 @@ int main() {
             printf("%s\n", attributes[i].attribute_values[j]);
         }
     }
+#endif
 
 	char* InputValueSet[AttributeSetSize];
 	InputValueSet[0] = "City";
-	InputValueSet[0] = "Cardiologist";
-	InputValueSet[0] = "Male";
-	InputValueSet[0] = "105-2568";
+	InputValueSet[1] = "Cardiologist";
+	InputValueSet[2] = "Male";
+	InputValueSet[3] = "105-2568";
 
-	PUB_INFO epsilon;
-	SECRET S;
-	AS S_incline;
-	Ts ts;
-	Delta delta;
-	Fakekey fakekey;
+	// PUB_INFO epsilon;
+	// SECRET S;
+	mpz_t lambda;
+    mpz_init_set_ui(lambda, 256);
+    setup(lambda);
 	for(int i=0; i<AttributeSetSize; ++i){
 		int cnt = 0;
 		while(InputValueSet[i] != attributes[i].attribute_values[cnt]){
@@ -206,5 +215,5 @@ int main() {
     printf("AttributeName: %s \nAttributeSetValue: %s \n", attributes[i].attribute_name, attributes[i].attribute_values[S_incline.LS[i]]);
 #endif
 	}
-	trapgen(&epsilon, &S, &S_incline, &ts, &delta, &fakekey);
+	trapgen(/*&epsilon, &S, &S_incline, &ts, &delta, &fakekey*/);
 }
