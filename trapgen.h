@@ -8,16 +8,10 @@
 #include <time.h>
 #include "setup.h"
 
+void trapgen(PUB_INFO epsilon, SECRET S, char** InputValueSet);
+
 // for attribute set index & value
 #define ATTRIBUTESETSIZE 4
-
-typedef struct AttributeSet {
-    char* attribute_name;
-    char* attribute_values[5];
-    int num_values;
-}ATTRIBUTESET;
-
-ATTRIBUTESET attributes[ATTRIBUTESETSIZE];  // Assuming you have ATTRIBUTESETSIZE attributes
 
 typedef struct Trapdoor{
 	element_t K01;
@@ -34,12 +28,6 @@ typedef struct Trapdoor{
 
 TRAPDOOR ts;
 
-typedef struct As{
-	int LS[ATTRIBUTESETSIZE];
-}AS;
-
-AS S_incline;
-
 typedef struct Delta{
 	int b;
 	element_t U;
@@ -53,7 +41,21 @@ typedef struct Fakekey{
 
 FAKEKEY fakekey;
 
-void trapgen(char** InputValueSet){
+typedef struct As{
+	int LS[ATTRIBUTESETSIZE];
+}AS;
+
+AS S_incline;
+
+typedef struct AttributeSet {
+    char* attribute_name;
+    char* attribute_values[5];
+    int num_values;
+}ATTRIBUTESET;
+
+ATTRIBUTESET attributes[ATTRIBUTESETSIZE];  // Assuming you have ATTRIBUTESETSIZE attributes
+
+void trapgen(PUB_INFO epsilon, SECRET S, char** InputValueSet){
 
 	// Hospital attribute
     attributes[0].attribute_name = "Hospital";
@@ -195,6 +197,6 @@ int main() {
 	InputValueSet[2] = "Male";
 	InputValueSet[3] = "105-2568";
 
-	trapgen(InputValueSet);
+	trapgen(epsilon, S, InputValueSet);
 }
 #endif
