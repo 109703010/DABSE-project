@@ -41,12 +41,6 @@ typedef struct Fakekey{
 
 FAKEKEY fakekey;
 
-typedef struct As{
-	int LS[ATTRIBUTESETSIZE];
-}AS;
-
-AS S_incline;
-
 typedef struct AttributeSet {
     char* attribute_name;
     char* attribute_values[5];
@@ -56,6 +50,9 @@ typedef struct AttributeSet {
 ATTRIBUTESET attributes[ATTRIBUTESETSIZE];  // Assuming you have ATTRIBUTESETSIZE attributes
 
 void trapgen(PUB_INFO epsilon, SECRET S, char** InputValueSet){
+
+	size_t numElements = sizeof(InputValueSet) / sizeof(InputValueSet[0]);
+	int S_incline[numElements];
 
 	// Hospital attribute
     attributes[0].attribute_name = "Hospital";
@@ -98,7 +95,7 @@ void trapgen(PUB_INFO epsilon, SECRET S, char** InputValueSet){
 				break;
 			}
 		}
-		S_incline.LS[i] = cnt;
+		S_incline[i] = cnt;
 	}
 
 	// Create, initialize, and seed a new random number generator.
@@ -116,9 +113,9 @@ void trapgen(PUB_INFO epsilon, SECRET S, char** InputValueSet){
 	mpz_urandomm(beta, state, epsilon.N);
 
 	// L'
-	AS Spl_incline;
+	int Spl_incline[ATTRIBUTESETSIZE];
 	for(int i=0; i<ATTRIBUTESETSIZE; ++i){
-		Spl_incline.LS[i] = (S_incline.LS[i] + 1) % attributes[i].num_values;
+		Spl_incline[i] = (S_incline[i] + 1) % attributes[i].num_values;
 	}
 
 	// for calculate
@@ -143,14 +140,14 @@ void trapgen(PUB_INFO epsilon, SECRET S, char** InputValueSet){
 		element_init_G1(ts.K03[i], epsilon.pairing_of_G);
 	    element_init_G1(ts.K13[i], epsilon.pairing_of_G);
 		if(delta.b == 0){
-			epsilon.H_2(ts.K03[i], attributes[i].attribute_values[S_incline.LS[i]], strlen(attributes[i].attribute_values[S_incline.LS[i]]), epsilon.g1, epsilon.g2);
+			S.H_2_(ts.K03[i], attributes[i].attribute_values[S_incline[i]], strlen(attributes[i].attribute_values[S_incline[i]]), epsilon.g2);
 			element_pow_mpz(ts.K03[i], ts.K03[i], t);	// K0,3,i
-			epsilon.H_2(ts.K13[i], attributes[i].attribute_values[Spl_incline.LS[i]], strlen(attributes[i].attribute_values[Spl_incline.LS[i]]), epsilon.g1, epsilon.g3);
+			S.H_2_(ts.K13[i], attributes[i].attribute_values[Spl_incline[i]], strlen(attributes[i].attribute_values[Spl_incline[i]]), epsilon.g3);
 			element_pow_mpz(ts.K13[i], ts.K13[i], t);	// K1,3,i
 		}else{
-			epsilon.H_2(ts.K03[i], attributes[i].attribute_values[S_incline.LS[i]], strlen(attributes[i].attribute_values[S_incline.LS[i]]), epsilon.g1, epsilon.g3);
+			S.H_2_(ts.K03[i], attributes[i].attribute_values[S_incline[i]], strlen(attributes[i].attribute_values[S_incline[i]]), epsilon.g3);
 			element_pow_mpz(ts.K03[i], ts.K03[i], t);	// K0,3,i
-			epsilon.H_2(ts.K03[i], attributes[i].attribute_values[Spl_incline.LS[i]], strlen(attributes[i].attribute_values[Spl_incline.LS[i]]), epsilon.g1, epsilon.g2);
+			S.H_2_(ts.K03[i], attributes[i].attribute_values[Spl_incline[i]], strlen(attributes[i].attribute_values[Spl_incline[i]]), epsilon.g2);
 			element_pow_mpz(ts.K13[i], ts.K13[i], t);	// K1,3,i
 		}
 	}
@@ -199,4 +196,5 @@ int main() {
 
 	trapgen(epsilon, S, InputValueSet);
 }
+#endif
 #endif
