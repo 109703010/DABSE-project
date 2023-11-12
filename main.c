@@ -24,7 +24,7 @@ int main(void) {
   char* T[] = {"Central hospital", "311-4321", "City hospital", "Genetics", "Male"};
   
   // For trapgen
-  char* testAttributeName[2][3] = {{"Hospital", "Sex", "Doctor number"}, {"Hospital", "Sex", "Department"}};
+  char* IS[2][3] = {{"Hospital", "Sex", "Doctor number"}, {"Hospital", "Sex", "Department"}};
   char* LS[2][3] = {{"Central hospital", "Male", "311-4321"}, {"City hospital", "Female", "Genetics"}};
 
   /*** Initialization End ***/
@@ -34,10 +34,10 @@ int main(void) {
 
   setup(lambda);
   Enc(epsilon, message, A, T);
-  trapgen(epsilon);
+  trapgen(epsilon, S, LS[i]);
   test(epsilon, C, ts);
-  test2(epsilon);
-  dec();
+  test2(epsilon, delte, C_prime);
+  dec(epsilon, S, C_prime);
 
   /*** Execution End***/
   return 0;
