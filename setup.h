@@ -1,3 +1,5 @@
+#ifndef SETUP_H
+#define SETUP_H
 #include <gmp.h>
 #include <openssl/sha.h>
 #include <pbc/pbc.h>
@@ -196,4 +198,5 @@ int main() {
     setup(lambda);
     return 0;
 }
+#endif
 #endif
