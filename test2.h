@@ -19,7 +19,7 @@ int test2() {
     element_to_mpz(symmetric_key, v);
     v_str = mpz_get_str(NULL, 10, symmetric_key);
     epsilon.H(&check, v_str, strlen(v_str), epsilon.lambda);
-    if (strcmp(check, C_prime.V)) {
+    if (!strcmp(check, C_prime.V)) {
         return 1;
     } else {
         return 0;
