@@ -6,7 +6,7 @@
 
 mpz_t symmetric_key;
 
-bool test2() {
+int test2() {
     element_t v;
     mpz_t pow;
     char *v_str, *check;
