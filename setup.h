@@ -11,7 +11,7 @@
 
 typedef struct pub_info {
     pairing_t pairing_of_G;
-    mpz_t N;
+    mpz_t N, gamma, lambda;
     element_t g1, g2, g3, g2_a, g3_a;
     element_t e_g1_g1_alpha, e_g2_g2_alpha, e_g3_g3_alpha;
     void (*H)(unsigned char**, char*, int, int);
@@ -49,7 +49,7 @@ typedef struct generator {
 /// @param input_size: count by byte
 /// @param output_size: count by byte
 void pub_info_H(unsigned char** hash, char* input_str, int input_size, int output_size) {
-    *hash = (unsigned char*)malloc((output_size) * sizeof(unsigned char));
+    static* hash = (unsigned char*)malloc((output_size) * sizeof(unsigned char));
     unsigned char sha256_hash[SHA256_DIGEST_LENGTH];
     // 创建SHA-256哈希对象
     SHA256_CTX sha256;
@@ -97,7 +97,7 @@ void setup(mpz_t lambda) {
     GENERATOR gen;
     pbc_param_t custom_param;
     element_t check;
-    mpz_t tmp, gamma, alpha, a;
+    mpz_t tmp, alpha, a;
     gmp_randstate_t state;
 
     mpz_init(group_order.N);
@@ -140,11 +140,12 @@ void setup(mpz_t lambda) {
     element_init_same_as(epsilon.g2, gen.g_2);
     element_init_same_as(epsilon.g3, gen.g_3);
 
-    mpz_init(gamma);
+    mpz_init(epsilon.gamma);
+    mpz_init_set(epsilon.lambda, lambda);
     mpz_init(alpha);
     mpz_init(a);
     gmp_randinit_default(state);
-    mpz_urandomm(gamma, state, lambda);
+    mpz_urandomm(epsilon.gamma, state, lambda);
     mpz_urandomm(alpha, state, group_order.N);
     mpz_urandomm(a, state, group_order.N);
 #if defined(DEBUG)
