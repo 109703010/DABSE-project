@@ -15,18 +15,19 @@ int main(void){
     mpz_t lambda;
     mpz_init_set_ui(lambda, 256);
     setup(lambda);
+
     char* message = "This project almost killed us. : ( \n I would appreciate it if my professor gives me a 100.";
     char* accessString = "((A & D) | ((A & B) & C))"; 
     Policy A = convertToPolicy(accessString);
     char* T[] = {"Central Hospital", "311-4321", "City Hospital", "Genetics", "Male"};
     Enc(epsilon, message, A, T);
-    char* InputValueSet[ATTRIBUTESETSIZE];
-	InputValueSet[0] = "City";
-	InputValueSet[1] = "Cardiologist";
-	InputValueSet[2] = "Male";
-	InputValueSet[3] = "105-2568";
-    trapgen(epsilon, S, InputValueSet);
+
+    ATTRIBUTESET attrSet = {NULL, NULL, 0};
+    setAttributeSet(&attrSet);
+	trapgen(epsilon, S, attrSet);
+
     // add test, test2
+    
     Dec(epsilon, S, C_prime);
     return 0;
 }
