@@ -11,7 +11,7 @@ typedef struct Attribute{
     int num_values;
 } ATTRIBUTE;
 
-ATTRIBUTE* setAttribute(int* attributeCnt, const char* filename);
+ATTRIBUTE* setAttribute(int* attributeCnt);
 
 // ATTRIBUTE* attributeCatergories = NULL;
 // int numAttributeCatergories = 0;
@@ -45,9 +45,9 @@ void printAttribute(ATTRIBUTE* attributes, int numattributes){
     }
 }
 
-ATTRIBUTE* setAttribute(int* attributeCnt, const char* filename) {
-    FILE* file = fopen(filename, "r");
-    if (!file) {
+ATTRIBUTE* setAttribute(int* attributeCnt) {
+    FILE* file = fopen("attribute/AttributeCategory.txt", "r");
+    if (file == NULL) {
         perror("無法打開文件");
         exit(EXIT_FAILURE);
     }
