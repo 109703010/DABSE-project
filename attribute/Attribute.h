@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-ATTRIBUTE* setAttribute(int* attributeCnt, const char* filename)
-
 // 定義結構STRUCT，代表每個attribute
 typedef struct Attribute{
     char* attribute_name;
@@ -13,8 +11,10 @@ typedef struct Attribute{
     int num_values;
 } ATTRIBUTE;
 
-ATTRIBUTE* attributeCatergories = NULL;
-int numAttributeCatergories = 0;
+ATTRIBUTE* setAttribute(int* attributeCnt, const char* filename)
+
+// ATTRIBUTE* attributeCatergories = NULL;
+// int numAttributeCatergories = 0;
 
 // 函式：釋放動態分配的記憶體
 void freeMemory(ATTRIBUTE* attributes, int num_values) {
