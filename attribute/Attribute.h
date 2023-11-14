@@ -11,7 +11,7 @@ typedef struct Attribute{
     int num_values;
 } ATTRIBUTE;
 
-ATTRIBUTE* setAttribute(int* attributeCnt, const char* filename)
+ATTRIBUTE* setAttribute(int* attributeCnt, const char* filename);
 
 // ATTRIBUTE* attributeCatergories = NULL;
 // int numAttributeCatergories = 0;
