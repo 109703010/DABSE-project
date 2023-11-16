@@ -15,12 +15,12 @@ void setAttributeSet(ATTRIBUTESET* attrSet) {
     char feature[100];
     while (1) {
         printf("請輸入attribute name（輸入 quit 結束）：\n");
-        scanf("%99s", name);
+        fgets(name, 100, stdin);
         if (strcmp(name, "quit") == 0) {
             break;
         }
         printf("請輸入 %s 的attribute value：", name);
-        scanf("%99s", feature);
+        fgets(feature, 100, stdin);
 
         attrSet->setSize++;
         attrSet->IS = realloc(attrSet->IS, attrSet->setSize * sizeof(char*));
