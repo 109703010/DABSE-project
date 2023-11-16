@@ -20,14 +20,13 @@ int main(void){
     char* accessString = "((A & D) | ((A & B) & C))"; 
     Policy A = convertToPolicy(accessString);
     char* T[] = {"Central Hospital", "311-4321", "City Hospital", "Genetics", "Male"};
-    Enc(epsilon, message, A, T);
-
     ATTRIBUTESET attrSet = {NULL, NULL, 0};
     setAttributeSet(&attrSet);
+    Enc(epsilon, message, A, T);
 	trapgen(epsilon, S, attrSet);
 
     // add test, test2
-    
+
     Dec(epsilon, S, C_prime);
     return 0;
 }
