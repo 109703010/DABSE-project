@@ -1,0 +1,4 @@
+Hospital
+Department
+Sex
+Doctor_number

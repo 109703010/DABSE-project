@@ -6,9 +6,9 @@
 
 // 定義結構STRUCT，代表每個attribute
 typedef struct Attribute{
-    char* attribute_name;
-    char** attribute_values;
-    int num_values;
+  char* attribute_name;
+  char** attribute_values;
+  int num_values;
 } ATTRIBUTE;
 
 ATTRIBUTE* setAttribute(int* attributeCnt);
@@ -18,85 +18,92 @@ ATTRIBUTE* setAttribute(int* attributeCnt);
 
 // 函式：釋放動態分配的記憶體
 void freeMemory(ATTRIBUTE* attributes, int num_values) {
-    for (int i = 0; i < num_values; ++i) {
-        free(attributes[i].attribute_name);
-        for (int j = 0; j < attributes[i].num_values; ++j) {
-            free(attributes[i].attribute_values[j]);
-        }
-        free(attributes[i].attribute_values);
-    }
-    free(attributes);
+  for (int i = 0; i < num_values; ++i) {
+	free(attributes[i].attribute_name);
+	for (int j = 0; j < attributes[i].num_values; ++j) {
+	  free(attributes[i].attribute_values[j]);
+	}
+	free(attributes[i].attribute_values);
+  }
+  free(attributes);
 }
 
 void printAttribute(ATTRIBUTE* attributes, int numattributes){
-    // 輸出每個attribute的內容
-    printf("\n所有attribute的內容如下：\n");
-    for (int i = 0; i < numattributes; ++i) {
-        printf("attribute name：%s\n", attributes[i].attribute_name);
-        printf("numbers of attribute values：%d\n", attributes[i].num_values);
-        printf("attribute values' name：");
-        for (int j = 0; j < attributes[i].num_values; ++j) {
-            printf("%s", attributes[i].attribute_values[j]);
-            if (j < attributes[i].num_values - 1) {
-                printf(", ");
-            }
-        }
-        printf("\n\n");
-    }
+  // 輸出每個attribute的內容
+  printf("\n所有attribute的內容如下：\n");
+  for (int i = 0; i < numattributes; ++i) {
+	printf("attribute name：%s\n", attributes[i].attribute_name);
+	printf("numbers of attribute values：%d\n", attributes[i].num_values);
+	printf("attribute values' name：");
+	for (int j = 0; j < attributes[i].num_values; ++j) {
+	  printf("%s", attributes[i].attribute_values[j]);
+	  if (j < attributes[i].num_values - 1) {
+		printf(", ");
+	  }
+	}
+	printf("\n\n");
+  }
 }
 
 ATTRIBUTE* setAttribute(int* attributeCnt) {
-    FILE* file = fopen("attribute/AttributeCategory.txt", "r");
-    if (file == NULL) {
-        perror("無法打開文件");
-        exit(EXIT_FAILURE);
-    }
+  FILE* file = fopen("attribute/AttributeName.txt", "r");
+  if (file == NULL) {
+	perror("無法打開文件");
+	exit(EXIT_FAILURE);
+  }
 
-    int numAttributes = 0;
-    ATTRIBUTE* attributes = NULL;
-    char line[500];
+  int numAttributes = 0;
+  ATTRIBUTE* attributes = NULL;
+  char name[50];
 
-    while (fgets(line, sizeof(line), file)) {
-        // 刪除換行符
-        line[strcspn(line, "\n")] = '\0';
+  while (fgets(name, sizeof(name), file)) {
+	// 刪除換行符
+	name[strcspn(name, "\n")] = '\0';
 
-        // 解析行
-        char* name = strtok(line, ":");
-        char* values = strtok(NULL, ":");
+	numAttributes++;
+	attributes = realloc(attributes, numAttributes * sizeof(ATTRIBUTE));
+	attributes[numAttributes - 1].attribute_name = strdup(name);
+	attributes[numAttributes - 1].attribute_values = NULL;
+	attributes[numAttributes - 1].num_values = 0;
 
-        numAttributes++;
-        attributes = realloc(attributes, numAttributes * sizeof(ATTRIBUTE));
-        attributes[numAttributes - 1].attribute_name = strdup(name);
-        attributes[numAttributes - 1].attribute_values = NULL;
-        attributes[numAttributes - 1].num_values = 0;
+	char valueRoute[100] = "attribute/AttributeValues/";
+	strcat(valueRoute, name);
+	FILE* valueFile = fopen(valueRoute, "r");
+	if (valueFile == NULL) {
+	  puts("Not OK");
+	  perror("無法打開文件");
+	  exit(EXIT_FAILURE);
+	}
 
-        char* value = strtok(values, ",");
-        while (value != NULL) {
-            attributes[numAttributes - 1].num_values++;
-            attributes[numAttributes - 1].attribute_values = realloc(attributes[numAttributes - 1].attribute_values, attributes[numAttributes - 1].num_values * sizeof(char*));
-            attributes[numAttributes - 1].attribute_values[attributes[numAttributes - 1].num_values - 1] = strdup(value);
+	char values[1000];
+	fgets(values, sizeof(values), valueFile);
+	fclose(valueFile);
+	char* value = strtok(values, ",");
+	while (value != NULL) {
+	  attributes[numAttributes - 1].num_values++;
+	  attributes[numAttributes - 1].attribute_values = realloc(attributes[numAttributes - 1].attribute_values, attributes[numAttributes - 1].num_values * sizeof(char*));
+	  attributes[numAttributes - 1].attribute_values[attributes[numAttributes - 1].num_values - 1] = strdup(value);
+	  value = strtok(NULL, ",");
+	}
+  }
 
-            value = strtok(NULL, ",");
-        }
-    }
-
-    fclose(file);
-    *attributeCnt = numAttributes;
-    return attributes;
+  fclose(file);
+  *attributeCnt = numAttributes;
+  return attributes;
 }
 
 #if defined(DEBUG)
 int main() {
-    int numattributes = 0;
-    ATTRIBUTE* attributes = setAttribute(&numattributes, "AttributeCategory.txt");
+  int numattributes = 0;
+  ATTRIBUTE* attributes = setAttribute(&numattributes, "AttributeCategory.txt");
 
-    // ATTRIBUTE* a = getAttributes();
-    // int num = getAttributeCnt();
-    // printAttribute(a, num);
+  // ATTRIBUTE* a = getAttributes();
+  // int num = getAttributeCnt();
+  // printAttribute(a, num);
 
-    printAttribute(attributes, numattributes);
-    freeMemory(attributes, numattributes);
-    return 0;
+  printAttribute(attributes, numattributes);
+  freeMemory(attributes, numattributes);
+  return 0;
 }
 #endif
 #endif

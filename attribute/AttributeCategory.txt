@@ -1,4 +1,0 @@
-Hospital:City,People,Central,Provincial
-Department:Cardiologist,Stomatology,Neurology,Genetics
-Sex:Male,Female
-Doctor number:105-2568,021-6932,231-6421,311-4321
