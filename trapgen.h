@@ -19,6 +19,7 @@ typedef struct Trapdoor{
 	element_t K14;
 	element_t K15;
 	char** IS;
+	int ISSize;
 }TRAPDOOR;
 
 TRAPDOOR ts;
@@ -44,6 +45,7 @@ void trapgen(PUB_INFO epsilon, SECRET S, ATTRIBUTESET attrSet){
 	ts.K03 = realloc(ts.K03, attrSet.setSize * sizeof(element_t));
 	ts.K13 = realloc(ts.K13, attrSet.setSize * sizeof(element_t));
 	ts.IS = realloc(attrSet.IS, attrSet.setSize * sizeof(char*));
+	ts.ISSize = attrSet.setSize;
 
 	for(int i=0; i<attrSet.setSize; ++i){
 		int cnt = 0;
