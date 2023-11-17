@@ -127,8 +127,10 @@ void appendAttributeName(char* fileName){
     printf("Enter the Attribute name to append: ");
     fgets(Name, sizeof(Name), stdin);
     // Write the attributeName to the file
-    char *attributeName = strtok(Name, "\n");
-    fputs(attributeName, file);
+    char *tmp = strtok(Name, "\n");
+    fputs(tmp, file);
+    char *attributeName;
+    sprintf((char *)attributeName, "AttributeValues/%s", tmp);
     FILE *newFile = fopen(attributeName, "w");
     if (newFile == NULL) {
         printf("Error creating the file.\n");
