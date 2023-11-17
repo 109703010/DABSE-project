@@ -130,7 +130,7 @@ void appendAttributeName(char* fileName){
     // Write the attributeName to the file
     char *tmp = strtok(Name, "\n");
     fputs(tmp, file);
-    char *attributeName;
+    char *attributeName = (char*)malloc(120);
     sprintf((char *)attributeName, "AttributeValues/%s", tmp);
     FILE *newFile = fopen(attributeName, "w");
     if (newFile == NULL) {
