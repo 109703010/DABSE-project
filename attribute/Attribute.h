@@ -94,6 +94,7 @@ void appendAttributeValue(){
     file = fopen(attributeName, "a");
     if (file == NULL) {
         printf("Error opening the file.\n");
+        exit(EXIT_FAILURE);
     }
     // Get a attribute value of text from the user
     printf("Enter the Attribute value to append: ");
@@ -135,9 +136,9 @@ void appendAttributeName(char* fileName){
     if (newFile == NULL) {
         printf("Error creating the file.\n");
     }
-    setAttributeValue(attributeName);
+    setAttributeValue(tmp);
     fclose(file);
-    printf("Attribute name %s appended to %s.\n", attributeName, fileName);
+    printf("Attribute name %s appended to %s.\n", tmp, fileName);
 }
 
 
