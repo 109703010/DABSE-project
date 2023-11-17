@@ -111,6 +111,7 @@ void setAttributeValue(char* attributeName){
     file = fopen(attributeName, "a");
     if (file == NULL) {
         printf("Error opening the file.\n");
+        exit(EXIT_FAILURE);
     }
     fputs("default", file);
     printf("default attribute value appended to the %s file.\n", attributeName);
@@ -122,6 +123,7 @@ void appendAttributeName(char* fileName){
     file = fopen(fileName, "a");
     if (file == NULL) {
         printf("Error opening the file.\n");
+        exit(EXIT_FAILURE);
     }
   
     // Get a attributeName of text from the user
@@ -135,6 +137,7 @@ void appendAttributeName(char* fileName){
     FILE *newFile = fopen(attributeName, "w");
     if (newFile == NULL) {
         printf("Error creating the file.\n");
+        exit(EXIT_FAILURE);
     }
     setAttributeValue(tmp);
     fclose(file);
