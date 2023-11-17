@@ -79,11 +79,65 @@ ATTRIBUTE* setAttribute(int* attributeCnt) {
             value = strtok(NULL, ",");
         }
     }
-
     fclose(file);
     *attributeCnt = numAttributes;
     return attributes;
 }
+
+void appendAttributeValue(){
+    FILE *file;
+    char Name[100];
+    char Value[100];
+    printf("Enter the Attribute Name where the Attribute Value you want to append: ");
+    fgets(Name, sizeof(Name), stdin);
+    char *attributeName = strtok(Name, "\n");
+    file = fopen(attributeName, "a");
+    if (file == NULL) {
+        printf("Error opening the file.\n");
+    }
+    // Get a attribute value of text from the user
+    printf("Enter the Attribute value to append: ");
+    fgets(Value, sizeof(Value), stdin);
+    char *attributeValue = strtok(Value, "\n");
+    // Write the attributeName to the file
+    fputs(attributeValue, file);
+    fputs(",", file);
+    printf("Attribute value %s appended to the %s file.\n", attributeValue, attributeName);
+}
+
+void setAttributeValue(char* attributeName){
+    FILE *file;
+    file = fopen(attributeName, "a");
+    if (file == NULL) {
+        printf("Error opening the file.\n");
+    }
+    fputs("default", file);
+    printf("default attribute value appended to the %s file.\n", attributeName);
+}
+
+void appendAttributeName(char* fileName){
+    FILE *file;
+    char Name[100];
+    file = fopen(fileName, "a");
+    if (file == NULL) {
+        printf("Error opening the file.\n");
+    }
+  
+    // Get a attributeName of text from the user
+    printf("Enter the Attribute name to append: ");
+    fgets(Name, sizeof(Name), stdin);
+    // Write the attributeName to the file
+    char *attributeName = strtok(Name, "\n");
+    fputs(attributeName, file);
+    FILE *newFile = fopen(attributeName, "w");
+    if (newFile == NULL) {
+        printf("Error creating the file.\n");
+    }
+    setAttributeValue(attributeName);
+    fclose(file);
+    printf("Attribute name %s appended to %s.\n", attributeName, fileName);
+}
+
 
 #if defined(DEBUG)
 int main() {
