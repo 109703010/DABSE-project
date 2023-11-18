@@ -111,21 +111,26 @@ void appendAttributeValue(){
     fgets(Value, sizeof(Value), stdin);
     char *attributeValue = strtok(Value, "\n");
     // Write the attributeName to the file
-    fputs(attributeValue, file);
     fputs(",", file);
+    fputs(attributeValue, file);
+    fclose(file);
     printf("Attribute value %s appended to the %s file.\n", attributeValue, attributeName);
     free(attributeName);
 }
 
-void setAttributeValue(char* attributeName){
+void setAttributeValue(char* Name){
     FILE *file;
+    char* attributeName = (char*)malloc(120);
+    sprintf((char *)attributeName, "attribute/AttributeValues/%s", Name);
     file = fopen(attributeName, "a");
     if (file == NULL) {
         printf("Error opening the file.\n");
         exit(EXIT_FAILURE);
     }
     fputs("default", file);
+    fclose(file);
     printf("default attribute value appended to the %s file.\n", attributeName);
+    free(attributeName);
 }
 
 void appendAttributeName(char* fileName){
@@ -143,14 +148,17 @@ void appendAttributeName(char* fileName){
     // Write the attributeName to the file
     char *tmp = strtok(Name, "\n");
     fputs(tmp, file);
+    fputs("\n", file);
     char *attributeName = (char*)malloc(120);
-    sprintf((char *)attributeName, "AttributeValues/%s", tmp);
+    sprintf((char *)attributeName, "attribute/AttributeValues/%s", tmp);
+    printf("%s\n", attributeName);
     FILE *newFile = fopen(attributeName, "w");
     if (newFile == NULL) {
         printf("Error creating the file.\n");
         exit(EXIT_FAILURE);
     }
     setAttributeValue(tmp);
+    fclose(newFile);
     fclose(file);
     printf("Attribute name %s appended to %s.\n", tmp, fileName);
     free(attributeName);
