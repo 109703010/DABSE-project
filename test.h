@@ -4,6 +4,7 @@
 #include "enc.h"
 #include "policy/getOmega.h"
 #include "trapgen.c"
+#include "attribute/Attribute.h"
 
 typedef struct {
   int VALID; // 0 implies perp
@@ -15,15 +16,14 @@ typedef struct {
 
 INTER_CIPHER C_prime;
 
-void test(PUB_INFO epsilon, CIPHERTEXT C, Ts ts) {
-  int Is_size = 3; // = ts.Is_size;
-  char *Is = "ABC"; // = ts.Is;
+void test(PUB_INFO epsilon, CIPHERTEXT C, TRAPDOOR ts) {
   C_prime.VALID = 0;
+  char* IS = AttributeNameConversion(ts.IS, ts.ISSize);
   int* A_prime[C.A.l];
   int l_prime = 0;
   for(int i = 0; i < C.A.l; ++i) {
-	for(int j = 0; j < Is_size; ++j) {
-	  if(Is[j] == C.A.rho[i]) {
+	for(int j = 0; j < ts.ISSize; ++j) {
+	  if(IS[j] == C.A.rho[i]) {
 		A_prime[l_prime++] = C.A.M[i];
 		break;
 	  }
@@ -95,8 +95,7 @@ void test(PUB_INFO epsilon, CIPHERTEXT C, Ts ts) {
 
   gmp_randstate_t state;
   gmp_randinit_default(state);
-  unsigned long int seed = 123456;
-  gmp_randseed_ui(state, seed);
+  gmp_randseed_ui(state, time(NULL));
   mpz_t s_prime;
   mpz_init(s_prime);
   mpz_urandomm(s_prime, state, epsilon.N);
@@ -121,7 +120,7 @@ void test(PUB_INFO epsilon, CIPHERTEXT C, Ts ts) {
   element_mul(C_prime.Z, C_prime.Z, *Zj[b]);
   mpz_clear(s_prime);
   
-  C_prime.V = (unsigned char*)malloc(sizeof(unsigned char) * 128);
-  memcpy(C_prime.V, C.V2, 128);
+  C_prime.V = (unsigned char*)malloc(sizeof(unsigned char) * mpz_get_ui(epsilon.gamma));
+  memcpy(C_prime.V, C.V2, mpz_get_ui(epsilon.gamma));
 }
 #endif
