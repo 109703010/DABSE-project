@@ -4,7 +4,7 @@
 #include "policy/createPolicy.h"
 #include "ciphertext/SymmetricCipher.h"
 
-/*#define DEBUG = 1*/
+//#define DEBUG = 1
 
 typedef struct ciphertext {
   char* K;
@@ -20,7 +20,7 @@ typedef struct ciphertext {
 
 CIPHERTEXT C;
 
-void Enc(PUB_INFO epsilon, char* message, Policy A, char** T);
+void enc(PUB_INFO epsilon, char* message, Policy A, char** T);
 
 #if defined(DEBUG)
 int main(void) {
@@ -31,12 +31,12 @@ int main(void) {
   char* accessString = "((A & D) | ((A & B) & C))"; 
   Policy A = convertToPolicy(accessString);
   char* T[] = {"Central Hospital", "311-4321", "City Hospital", "Genetics", "Male"};
-  Enc(epsilon, message, A, T);
+  enc(epsilon, message, A, T);
   return 0;
 }
 #endif
 
-void Enc(PUB_INFO epsilon, char* message, Policy A, char** T) {
+void enc(PUB_INFO epsilon, char* message, Policy A, char** T) {
   mpz_t k;
   mpz_init(k);
   mpz_t s;
@@ -45,8 +45,7 @@ void Enc(PUB_INFO epsilon, char* message, Policy A, char** T) {
 
   gmp_randstate_t state;
   gmp_randinit_default(state);
-  unsigned long int seed = 12345;
-  gmp_randseed_ui(state, seed);
+  gmp_randseed_ui(state, time(NULL));
 
   mpz_t upperBound;
   mpz_init(upperBound);
@@ -134,11 +133,11 @@ void Enc(PUB_INFO epsilon, char* message, Policy A, char** T) {
   int n = element_length_in_bytes(k_e_g1_g1_alpha_s);
   tmpStr = pbc_malloc(n);
   element_to_bytes(tmpStr, k_e_g1_g1_alpha_s);
-  epsilon.H(&(C.V1), tmpStr, strlen(tmpStr), 256);
+  epsilon.H(&(C.V1), tmpStr, strlen(tmpStr), mpz_get_ui(epsilon.gamma));
   pbc_free(tmpStr);
 
   tmpStr = mpz_get_str(NULL, 10, k);
-  epsilon.H(&(C.V2), tmpStr, strlen(tmpStr), 128);
+  epsilon.H(&(C.V2), tmpStr, strlen(tmpStr), mpz_get_ui(epsilon.lambda));
   free(tmpStr);
 
   C.A = A;
