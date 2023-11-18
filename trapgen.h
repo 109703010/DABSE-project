@@ -1,29 +1,25 @@
 #ifndef TRAPGEN_H
 #define TRAPGEN_H
-#include <stdio.h>
-#include <gmp.h>
-#include <stdlib.h>
-#include <string.h>
-#include <pbc/pbc.h>
 #include <time.h>
 #include "setup.h"
+#include "attribute/Attribute.h"
+#include "attribute/AttributeSet.h"
 
-void trapgen(PUB_INFO epsilon, SECRET S, char** InputValueSet);
-
-// for attribute set index & value
-#define ATTRIBUTESETSIZE 4
+void trapgen(PUB_INFO epsilon, SECRET S, ATTRIBUTESET attrSet);
 
 typedef struct Trapdoor{
 	element_t K01;
 	element_t K02;
 	element_t K11;
 	element_t K12;
-	element_t K03[ATTRIBUTESETSIZE];
-	element_t K13[ATTRIBUTESETSIZE];
+	element_t *K03;
+	element_t *K13;
 	element_t K04;
 	element_t K05;
 	element_t K14;
 	element_t K15;
+	char** IS;
+	int ISSize;
 }TRAPDOOR;
 
 TRAPDOOR ts;
@@ -41,64 +37,43 @@ typedef struct Fakekey{
 
 FAKEKEY fakekey;
 
-typedef struct As{
-	int LS[ATTRIBUTESETSIZE];
-}AS;
+void trapgen(PUB_INFO epsilon, SECRET S, ATTRIBUTESET attrSet){
 
-AS S_incline;
+	int numattributes = 0;
+    ATTRIBUTE* attributes = setAttribute(&numattributes);
+	int S_incline[attrSet.setSize];
+	ts.K03 = realloc(ts.K03, attrSet.setSize * sizeof(element_t));
+	ts.K13 = realloc(ts.K13, attrSet.setSize * sizeof(element_t));
+	ts.IS = realloc(attrSet.IS, attrSet.setSize * sizeof(char*));
+	ts.ISSize = attrSet.setSize;
 
-typedef struct AttributeSet {
-    char* attribute_name;
-    char* attribute_values[5];
-    int num_values;
-}ATTRIBUTESET;
-
-ATTRIBUTESET attributes[ATTRIBUTESETSIZE];  // Assuming you have ATTRIBUTESETSIZE attributes
-
-void trapgen(PUB_INFO epsilon, SECRET S, char** InputValueSet){
-
-	// Hospital attribute
-    attributes[0].attribute_name = "Hospital";
-    attributes[0].attribute_values[0] = "City";
-    attributes[0].attribute_values[1] = "People";
-    attributes[0].attribute_values[2] = "Central";
-    attributes[0].attribute_values[3] = "Provincial";
-    attributes[0].attribute_values[4] = "";  // You can replace this with the default value
-    attributes[0].num_values = 5;
-
-    // Department attribute
-    attributes[1].attribute_name = "Department";
-    attributes[1].attribute_values[0] = "Cardiologist";
-    attributes[1].attribute_values[1] = "Stomatology";
-    attributes[1].attribute_values[2] = "Neurology";
-    attributes[1].attribute_values[3] = "Genetics";
-    attributes[1].attribute_values[4] = "";  // You can replace this with the default value
-    attributes[1].num_values = 5;
-
-    // Sex attribute
-    attributes[2].attribute_name = "Sex";
-    attributes[2].attribute_values[0] = "Male";
-    attributes[2].attribute_values[1] = "Female";
-    attributes[2].attribute_values[2] = "";  // You can replace this with the default value
-    attributes[2].num_values = 3;
-
-    // Doctor number attribute
-    attributes[3].attribute_name = "Doctor number";
-    attributes[3].attribute_values[0] = "105-2568";
-    attributes[3].attribute_values[1] = "021-6932";
-    attributes[3].attribute_values[2] = "231-6421";
-    attributes[3].attribute_values[3] = "311-4321";
-    attributes[3].attribute_values[4] = "";  // You can replace this with the default value
-    attributes[3].num_values = 5;
-
-	for(int i=0; i<ATTRIBUTESETSIZE; ++i){
+	for(int i=0; i<attrSet.setSize; ++i){
 		int cnt = 0;
-		while(InputValueSet[i] != attributes[i].attribute_values[cnt]){
-			if(cnt++ == attributes[i].num_values){
+		for(int j=0; j<numattributes; ++j){
+			if(strcmp(attrSet.IS[i], attributes[j].attribute_name) == 0){
+				for(int k=0; k<attributes[j].num_values; ++k){
+					if(strcmp(attrSet.LS[i], attributes[j].attribute_values[k]) == 0){
+						break;
+					}
+					else if(k == attributes[j].num_values - 1){
+						// add attribute value to attribute Category
+						// revise the num of values in attribute Category
+						// need to add functions in Attribute.h
+						cnt++;
+						break;
+					}
+					cnt++;
+				}
+				break;
+			}
+			else if(j == numattributes - 1){
+				// add attribute name to attribute Category
+				// revise the num of attributes in attribute Category
+				// need to add functions in Attribute.h
 				break;
 			}
 		}
-		S_incline.LS[i] = cnt;
+		S_incline[i] = cnt;
 	}
 
 	// Create, initialize, and seed a new random number generator.
@@ -116,9 +91,9 @@ void trapgen(PUB_INFO epsilon, SECRET S, char** InputValueSet){
 	mpz_urandomm(beta, state, epsilon.N);
 
 	// L'
-	AS Spl_incline;
-	for(int i=0; i<ATTRIBUTESETSIZE; ++i){
-		Spl_incline.LS[i] = (S_incline.LS[i] + 1) % attributes[i].num_values;
+	int Spl_incline[attrSet.setSize];
+	for(int i=0; i<attrSet.setSize; ++i){
+		Spl_incline[i] = S_incline[i] + (rand() % attributes[i].num_values);
 	}
 
 	// for calculate
@@ -139,18 +114,19 @@ void trapgen(PUB_INFO epsilon, SECRET S, char** InputValueSet){
 	element_mul(ts.K11, ts.K11, g3alpha);	// K1,1
     element_init_G1(ts.K12, epsilon.pairing_of_G);
 	element_pow_mpz(ts.K12, epsilon.g3, t);	// K1,2
-    for(int i=0; i<ATTRIBUTESETSIZE; ++i){
+    for(int i=0; i<attrSet.setSize; ++i){
 		element_init_G1(ts.K03[i], epsilon.pairing_of_G);
 	    element_init_G1(ts.K13[i], epsilon.pairing_of_G);
+		ts.IS[i] = strdup(attrSet.IS[i]);
 		if(delta.b == 0){
-			epsilon.H_2(ts.K03[i], attributes[i].attribute_values[S_incline.LS[i]], strlen(attributes[i].attribute_values[S_incline.LS[i]]), epsilon.g1, epsilon.g2);
+			S.H_2_(ts.K03[i], attributes[i].attribute_values[S_incline[i]], strlen(attributes[i].attribute_values[S_incline[i]]), epsilon.g2);
 			element_pow_mpz(ts.K03[i], ts.K03[i], t);	// K0,3,i
-			epsilon.H_2(ts.K13[i], attributes[i].attribute_values[Spl_incline.LS[i]], strlen(attributes[i].attribute_values[Spl_incline.LS[i]]), epsilon.g1, epsilon.g3);
+			S.H_2_(ts.K13[i], attributes[i].attribute_values[Spl_incline[i]], strlen(attributes[i].attribute_values[Spl_incline[i]]), epsilon.g3);
 			element_pow_mpz(ts.K13[i], ts.K13[i], t);	// K1,3,i
 		}else{
-			epsilon.H_2(ts.K03[i], attributes[i].attribute_values[S_incline.LS[i]], strlen(attributes[i].attribute_values[S_incline.LS[i]]), epsilon.g1, epsilon.g3);
+			S.H_2_(ts.K03[i], attributes[i].attribute_values[S_incline[i]], strlen(attributes[i].attribute_values[S_incline[i]]), epsilon.g3);
 			element_pow_mpz(ts.K03[i], ts.K03[i], t);	// K0,3,i
-			epsilon.H_2(ts.K03[i], attributes[i].attribute_values[Spl_incline.LS[i]], strlen(attributes[i].attribute_values[Spl_incline.LS[i]]), epsilon.g1, epsilon.g2);
+			S.H_2_(ts.K03[i], attributes[i].attribute_values[Spl_incline[i]], strlen(attributes[i].attribute_values[Spl_incline[i]]), epsilon.g2);
 			element_pow_mpz(ts.K13[i], ts.K13[i], t);	// K1,3,i
 		}
 	}
@@ -191,12 +167,12 @@ int main() {
     mpz_init_set_ui(lambda, 256);
     setup(lambda);
 
-	char* InputValueSet[ATTRIBUTESETSIZE];
-	InputValueSet[0] = "City";
-	InputValueSet[1] = "Cardiologist";
-	InputValueSet[2] = "Male";
-	InputValueSet[3] = "105-2568";
+	ATTRIBUTESET attrSet = {NULL, NULL, 0};
+    setAttributeSet(&attrSet);
 
-	trapgen(epsilon, S, InputValueSet);
+	trapgen(epsilon, S, attrSet);
+	// printf("1\n");
+	return 0;
 }
+#endif
 #endif
