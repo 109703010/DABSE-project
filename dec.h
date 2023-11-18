@@ -7,7 +7,7 @@
 void Dec(PUB_INFO, SECRET, INTER_CIPHER);
 
 void Dec(PUB_INFO epsilon, SECRET S, INTER_CIPHER C_prime){
-    int len = SDec(message, strlen(message), k, C_prime.K);
+    int len = SDec(C_prime.K, strlen(C_prime.K), symmetric_key, C_prime.K);
 };
 
 #if defined(DEBUG)
