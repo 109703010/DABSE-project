@@ -90,7 +90,9 @@ void appendAttributeValue(){
     char Value[100];
     printf("Enter the Attribute Name where the Attribute Value you want to append: ");
     fgets(Name, sizeof(Name), stdin);
-    char *attributeName = strtok(Name, "\n");
+    char *tmp = strtok(Name, "\n");
+    char *attributeName = (char*)malloc(130);
+    sprintf((char *)attributeName, "attribute/AttributeValues/%s", tmp);
     file = fopen(attributeName, "a");
     if (file == NULL) {
         printf("Error opening the file.\n");
@@ -104,6 +106,7 @@ void appendAttributeValue(){
     fputs(attributeValue, file);
     fputs(",", file);
     printf("Attribute value %s appended to the %s file.\n", attributeValue, attributeName);
+    free(attributeName);
 }
 
 void setAttributeValue(char* attributeName){
@@ -142,6 +145,7 @@ void appendAttributeName(char* fileName){
     setAttributeValue(tmp);
     fclose(file);
     printf("Attribute name %s appended to %s.\n", tmp, fileName);
+    free(attributeName);
 }
 
 
