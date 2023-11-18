@@ -1,3 +1,5 @@
+#ifndef SYMMETRIC_CIPHER_H
+#define SYMMETRIC_CIPHER_H
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -144,3 +146,4 @@ int SDec(const unsigned char *ciphertext, int ciphertext_len,
 
   return plaintext_len;
 }
+#endif
