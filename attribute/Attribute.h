@@ -156,6 +156,21 @@ void appendAttributeName(char* fileName){
     free(attributeName);
 }
 
+char* AttributeNameConversion(char** AttributeName, int num) {
+  int numAttributes = 0;
+  ATTRIBUTE* attributes = setAttribute(&numAttributes);
+  char* res = (char*)calloc(num, sizeof(char));
+  for(int i = 0; i < num; ++i) {
+	for(int j = 0; j < numAttributes; ++j) {
+	  if(strcmp(AttributeName[i], attributes[j].attribute_name) == 0) {
+		res[i] = 'A' + j;
+		break;
+	  }
+	}
+  }
+  freeMemory(attributes, numAttributes);
+  return res;
+}
 
 #if defined(DEBUG)
 int main() {
@@ -172,53 +187,3 @@ int main() {
 }
 #endif
 #endif
-
-// ATTRIBUTE* setAttribute2(int* attributeCnt){
-//     int numattributes = 0;
-//     ATTRIBUTE* attributes = NULL;
-//     char inputBuffer[500];
-//     while (1) {
-//         printf("please give me the attribute names, else type in 0\n");
-//         if (scanf("%499s", inputBuffer) == EOF) {
-//             break;  // 如果讀到 EOF，則結束迴圈
-//         }
-//         // 如果輸入為 "0"，表示結束
-//         if (strcmp(inputBuffer, "0") == 0) {
-//             break;
-//         }
-//         numattributes++;
-//         attributes = realloc(attributes, numattributes * sizeof(ATTRIBUTE));
-//         attributes[numattributes - 1].attribute_name = strdup(strtok(inputBuffer, "\n"));
-//         attributes[numattributes - 1].attribute_values = NULL;
-//         attributes[numattributes - 1].num_values = 0;
-
-//         char contentPtr[500];
-//         while (1) {
-//             printf("please give me the attribute values, else type in 0\n");
-//             if (scanf("%499s", contentPtr) == EOF) {
-//                 break;  // 如果讀到 EOF，則結束迴圈
-//             }
-//             // 如果輸入為 "0"，表示結束
-//             if (strcmp(contentPtr, "0") == 0) {
-//                 break;
-//             }
-//             attributes[numattributes - 1].num_values++;
-//             attributes[numattributes - 1].attribute_values = realloc(attributes[numattributes - 1].attribute_values, attributes[numattributes - 1].num_values * sizeof(char*));
-//             attributes[numattributes - 1].attribute_values[attributes[numattributes - 1].num_values - 1] = strdup(contentPtr);
-//         }
-//     }
-//     *attributeCnt = numattributes;
-//     return attributes;
-// }
-
-// ATTRIBUTE* getAttributes(){
-//     extern ATTRIBUTE* attributeCatergories;
-//     return attributeCatergories;
-// }
-
-// int getAttributeCnt(){
-//     extern int numAttributeCatergories;
-//     return numAttributeCatergories;
-// }
-
-
