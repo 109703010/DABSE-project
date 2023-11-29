@@ -18,14 +18,14 @@ int main(void) {
 
   // For enc
   char* message = "Long long way to go...";
-  char* attributeName[] = {"Hospital", "Department", "Sex", "Doctor number"};
+  char* attributeName[] = {"Hospital", "Department", "Sex", "Doctor_number"};
   char* accessString = "((A & D) | ((A & B) & C))"; 
   Policy A = convertToPolicy(accessString);
-  char* T[] = {"Central hospital", "311-4321", "City hospital", "Genetics", "Male"};
+  char* T[] = {"Central", "311-4321", "City", "Genetics", "Male"};
 
   // For trapgen
-  char* IS[2][3] = {{"Hospital", "Sex", "Doctor number"}, {"Hospital", "Sex", "Department"}};
-  char* LS[2][3] = {{"Central hospital", "Male", "311-4321"}, {"City hospital", "Female", "Genetics"}};
+  char* IS[2][3] = {{"Hospital", "Sex", "Doctor_number"}, {"Hospital", "Sex", "Department"}};
+  char* LS[2][3] = {{"Central", "Male", "311-4321"}, {"City", "Female", "Genetics"}};
 
   /*** Initialization End ***/
 
@@ -41,7 +41,7 @@ int main(void) {
 	aSet.setSize = 3;
 	puts("Here");
 	trapgen(epsilon, S, aSet);
-	puts("Here");
+	puts("Here2");
 	test(epsilon, C, ts);
 	puts("Here");
 	if(!C_prime.VALID) {

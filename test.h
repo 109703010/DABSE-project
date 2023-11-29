@@ -3,7 +3,7 @@
 #include "setup.h"
 #include "enc.h"
 #include "policy/getOmega.h"
-#include "trapgen.c"
+#include "trapgen.h"
 #include "attribute/Attribute.h"
 
 typedef struct {
