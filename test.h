@@ -29,6 +29,7 @@ void test(PUB_INFO epsilon, CIPHERTEXT C, TRAPDOOR ts) {
 	  }
 	}
   }
+  free(IS);
   int* row = get_indepedent_row(A_prime, l_prime, C.A.n);
   int* omega = get_omega(A_prime, row, C.A.n);
   if(!isValidOmega(omega)) {
@@ -57,10 +58,10 @@ void test(PUB_INFO epsilon, CIPHERTEXT C, TRAPDOOR ts) {
 	element_init_GT(Ej, epsilon.pairing_of_G);
 	element_set1(pi_X_omega);
 	element_set1(pi_K_omega);
-	for(int i = 0; i < row[0]; ++i) {
+	for(int i = 1; i <= row[0]; ++i) {
 	  mpz_set_si(omega_i, omega[row[i]]);
 	  element_pow_mpz(X_omega, C.X[row[i]], omega_i);
-	  element_pow_mpz(K_omega, Kj3[j][row[i]], omega_i);
+	  element_pow_mpz(K_omega, Kj3[j][C.A.rho[row[i]] - 'A'], omega_i);
 	  element_mul(pi_X_omega, pi_X_omega, X_omega);
 	  element_mul(pi_K_omega, pi_K_omega, K_omega);
 	}
@@ -74,8 +75,8 @@ void test(PUB_INFO epsilon, CIPHERTEXT C, TRAPDOOR ts) {
 	char* Ej_Str = (char*)malloc(sizeof(char) * len);
 	element_to_bytes(Ej_Str, Ej);
 	unsigned char* tmpStr;
-	epsilon.H(&tmpStr, Ej_Str, len, 256);
-	if(memcmp(tmpStr, C.V1, 256) == 0) {
+	epsilon.H(&tmpStr, Ej_Str, len, mpz_get_ui(epsilon.lambda));
+	if(memcmp(tmpStr, C.V1, mpz_get_ui(epsilon.lambda)) == 0) {
 	  C_prime.VALID = 1;
 	  b = j;
 	  break;
@@ -92,6 +93,7 @@ void test(PUB_INFO epsilon, CIPHERTEXT C, TRAPDOOR ts) {
 	element_clear(Ej);
 	return;
   }
+  puts("Here");
 
   gmp_randstate_t state;
   gmp_randinit_default(state);

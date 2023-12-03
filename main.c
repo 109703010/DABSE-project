@@ -32,24 +32,28 @@ int main(void) {
 
   /*** Execution Begin***/
 
+  puts("Run setup");
   setup(lambda);
+  puts("Run enc");
   enc(epsilon, message, A, T);
   ATTRIBUTESET aSet;
   for(int i = 0; i < 2; ++i) {
+	printf("\nSearching data %d:\n", i);
 	aSet.IS = IS[i];
 	aSet.LS = LS[i];
 	aSet.setSize = 3;
-	puts("Here");
+	puts("Run trapgen");
 	trapgen(epsilon, S, aSet);
-	puts("Here2");
+	puts("Run test");
 	test(epsilon, C, ts);
-	puts("Here");
 	if(!C_prime.VALID) {
 	  puts("Perp");
 	} else {
+	  puts("Run test2");
 	  if(!test2(epsilon, delta, C_prime)) {
 		puts("False positive");
 	  } else {
+		puts("Run Dec:");
 		Dec(epsilon, S, C_prime);
 	  }
 	}
