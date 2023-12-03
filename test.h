@@ -21,10 +21,12 @@ void test(PUB_INFO epsilon, CIPHERTEXT C, TRAPDOOR ts) {
   char* IS = AttributeNameConversion(ts.IS, ts.ISSize);
   int* A_prime[C.A.l];
   int l_prime = 0;
+  int row2orderTable[C.A.l];
   for(int i = 0; i < C.A.l; ++i) {
 	for(int j = 0; j < ts.ISSize; ++j) {
 	  if(IS[j] == C.A.rho[i]) {
-		A_prime[l_prime++] = C.A.M[i];
+		A_prime[l_prime] = C.A.M[i];
+		row2orderTable[l_prime++] = j;
 		break;
 	  }
 	}
@@ -61,7 +63,7 @@ void test(PUB_INFO epsilon, CIPHERTEXT C, TRAPDOOR ts) {
 	for(int i = 1; i <= row[0]; ++i) {
 	  mpz_set_si(omega_i, omega[row[i]]);
 	  element_pow_mpz(X_omega, C.X[row[i]], omega_i);
-	  element_pow_mpz(K_omega, Kj3[j][C.A.rho[row[i]] - 'A'], omega_i);
+	  element_pow_mpz(K_omega, Kj3[j][row2orderTable[row[i]]], omega_i);
 	  element_mul(pi_X_omega, pi_X_omega, X_omega);
 	  element_mul(pi_K_omega, pi_K_omega, K_omega);
 	}
@@ -93,7 +95,6 @@ void test(PUB_INFO epsilon, CIPHERTEXT C, TRAPDOOR ts) {
 	element_clear(Ej);
 	return;
   }
-  puts("Here");
 
   gmp_randstate_t state;
   gmp_randinit_default(state);
