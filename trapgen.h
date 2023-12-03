@@ -128,6 +128,7 @@ void trapgen(PUB_INFO epsilon, SECRET S, ATTRIBUTESET attrSet){
 		for(int j=0; j<numattributes; ++j){
 			if(strcmp(attrSet.IS[i], attributes[j].attribute_name) == 0){
 				if(delta.b == 0){
+					//printf("attribute value: %s %s\n", attrSet.LS[i], attributes[j].attribute_values[S_incline[i]]);
 					S.H_2_(ts.K03[i], attributes[j].attribute_values[S_incline[i]], strlen(attributes[j].attribute_values[S_incline[i]]), epsilon.g2);
 					element_pow_mpz(ts.K03[i], ts.K03[i], t);	// K0,3,i
 					S.H_2_(ts.K13[i], attributes[j].attribute_values[Spl_incline[i]], strlen(attributes[j].attribute_values[Spl_incline[i]]), epsilon.g3);
