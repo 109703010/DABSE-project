@@ -28,6 +28,10 @@ typedef struct secret {
 PUB_INFO epsilon;
 SECRET S;
 
+// get rid of warning messages
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 /// @brief: {0, 1}^* -> {0, 1}^(gamma)
 /// @param hash: output
 /// @param input_string: array of char
@@ -47,6 +51,8 @@ void pub_info_H(unsigned char** hash, char* input_str, int input_size, int outpu
     memcpy(*hash, sha256_hash, output_size);
     // 打印哈希值的十六进制表示
 }
+
+#pragma GCC diagnostic pop
 
 /// @brief {0,1}∗ → G_p2
 /// @param hash: output
@@ -84,17 +90,18 @@ void pub_info_H_2(element_t hash, char* input_str, int input_size, element_t g_1
 /// @param lambda
 void setup(mpz_t lambda) {
     pbc_param_t custom_param;
-    mpz_t a, p1, p2, p3;
+    mpz_t a, p1, p2, p3, tmp;
     gmp_randstate_t state;
     element_t check;
 
     mpz_init(epsilon.N);
-    // mpz_init_set_ui(p1, 941083987);
-    // mpz_init_set_ui(p2, 573259433);
-    // mpz_init_set_ui(p3, 334214467);
-    mpz_init_set_ui(p1, 11);
-    mpz_init_set_ui(p2, 23);
-    mpz_init_set_ui(p3, 7);
+    mpz_init(tmp);
+    mpz_init_set_ui(p1, 941083987);
+    mpz_init_set_ui(p2, 573259433);
+    mpz_init_set_ui(p3, 334214467);
+    // mpz_init_set_ui(p1, 139);
+    // mpz_init_set_ui(p2, 139);
+    // mpz_init_set_ui(p3, 139);
     mpz_mul(epsilon.N, p1, p2);
     mpz_mul(epsilon.N, epsilon.N, p3);
 
@@ -123,20 +130,21 @@ void setup(mpz_t lambda) {
     element_init_G1(check, epsilon.pairing_of_G);
 
     do {
-        element_random(epsilon.g1);
-        element_pow_mpz(check, epsilon.g1, p1);
-    } while (!element_is0(check) || element_is0(epsilon.g1));
+        element_random(epsilon.g1);  // 随机选择一个生成元
+        mpz_mul(tmp, p2, p3);
+        element_pow_mpz(epsilon.g1, epsilon.g1, tmp);  // 计算 g^(N/p1)
+    } while (element_is0(epsilon.g1));                 // g^(N/p1)==identity
     do {
-        element_random(epsilon.g2);
-        element_pow_mpz(check, epsilon.g2, p2);
-    } while (!element_is0(check) || element_is0(epsilon.g2));
+        element_random(epsilon.g2);  // 随机选择一个生成元
+        mpz_mul(tmp, p1, p3);
+        element_pow_mpz(epsilon.g2, epsilon.g2, tmp);  // 计算 g^(N/p2)
+    } while (element_is0(epsilon.g2));                 // g^(N/p2)==identity
     do {
-        element_random(epsilon.g3);
-        element_pow_mpz(check, epsilon.g3, p3);
-    } while (!element_is0(check) || element_is0(epsilon.g3));
+        element_random(epsilon.g3);  // 随机选择一个生成元
+        mpz_mul(tmp, p1, p2);
+        element_pow_mpz(epsilon.g3, epsilon.g3, tmp);  // 计算 g^(N/p3)
+    } while (element_is0(epsilon.g3));                 // g^(N/p3)==identity
 #if defined(DEBUG)
-    mpz_t tmp;
-    mpz_init(tmp);
     mpz_add_ui(tmp, p1, 1);
     element_pow_mpz(check, epsilon.g1, tmp);
     element_printf("g1: %B\n", epsilon.g1);
