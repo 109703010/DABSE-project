@@ -46,6 +46,7 @@ int main(void) {
 	trapgen(epsilon, S, aSet);
 	puts("Run test");
 	test(epsilon, C, ts);
+  char* plaintext;
 	if(!C_prime.VALID) {
 	  puts("Perp");
 	} else {
@@ -54,7 +55,7 @@ int main(void) {
 		puts("False positive");
 	  } else {
 		puts("Run Dec:");
-		Dec(epsilon, S, C_prime);
+		Dec(epsilon, symmetric_key, C_prime, plaintext);
 	  }
 	}
   }
