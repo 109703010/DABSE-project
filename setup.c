@@ -1,5 +1,3 @@
-#ifndef SETUP_H
-#define SETUP_H
 #include <gmp.h>
 #include <openssl/sha.h>
 #include <pbc/pbc.h>
@@ -7,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// #define DEBUG = 1;
+#define DEBUG = 1;
 
 typedef struct pub_info {
     pairing_t pairing_of_G;
@@ -220,5 +218,4 @@ int main() {
     mpz_clear(lambda);
     return 0;
 }
-#endif
 #endif
