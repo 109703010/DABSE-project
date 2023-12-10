@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <gmp.h>
+#include <pbc/pbc.h>
 #include <openssl/conf.h>
 #include <openssl/evp.h>
 #include <openssl/err.h>
@@ -14,11 +14,11 @@ unsigned char iv[EVP_MAX_IV_LENGTH] = "0123456789012345"; // 16字节IV
 
 // 加密函数
 int SEnc(const unsigned char *plaintext, int plaintext_len,
-	mpz_t k, unsigned char *ciphertext);
+	element_t k, unsigned char *ciphertext);
 
 // 解密函数
 int SDec(const unsigned char *ciphertext, int ciphertext_len,
-	mpz_t k, unsigned char *plaintext);
+	element_t k, unsigned char *plaintext);
 
 #if defined(DEBUG)
 int main() {
@@ -66,11 +66,14 @@ int main() {
 #endif
 
 int SEnc(const unsigned char *plaintext, int plaintext_len,
-	mpz_t k, unsigned char *ciphertext) {
+	element_t k, unsigned char *ciphertext) {
   EVP_CIPHER_CTX *ctx;
   // 密钥和初始化向量（IV）
-  unsigned char key[EVP_MAX_KEY_LENGTH] = "01234567890123456789012345678901"; // 32字节密钥
-  mpz_get_str(key, 10, k);
+  //unsigned char key[EVP_MAX_KEY_LENGTH] = "01234567890123456789012345678901"; // 32字节密钥
+  unsigned char* key;
+  int n = element_length_in_bytes(k);
+  key = pbc_malloc(n);
+  element_to_bytes(key, k);
 
   int len;
   int ciphertext_len;
@@ -102,16 +105,20 @@ int SEnc(const unsigned char *plaintext, int plaintext_len,
 
   // 释放加密上下文
   EVP_CIPHER_CTX_free(ctx);
+  pbc_free(key);
 
   return ciphertext_len;
 }
 
 // 解密函数
 int SDec(const unsigned char *ciphertext, int ciphertext_len,
-   	mpz_t k, unsigned char *plaintext) {
+   	element_t k, unsigned char *plaintext) {
   EVP_CIPHER_CTX *ctx;
-  unsigned char key[EVP_MAX_KEY_LENGTH] = "01234567890123456789012345678901"; // 32字节密钥
-  mpz_get_str(key, 10, k);
+  //unsigned char key[EVP_MAX_KEY_LENGTH] = "01234567890123456789012345678901"; // 32字节密钥
+  unsigned char* key;
+  int n = element_length_in_bytes(k);
+  key = pbc_malloc(n);
+  element_to_bytes(key, k);
 
   int len;
   int plaintext_len;
@@ -143,6 +150,7 @@ int SDec(const unsigned char *ciphertext, int ciphertext_len,
 
   // 释放解密上下文
   EVP_CIPHER_CTX_free(ctx);
+  pbc_free(key);
 
   return plaintext_len;
 }
