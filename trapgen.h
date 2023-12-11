@@ -134,9 +134,9 @@ void trapgen(PUB_INFO epsilon, SECRET S, ATTRIBUTESET attrSet){
 					S.H_2_(ts.K13[i], attributes[j].attribute_values[Spl_incline[i]], strlen(attributes[j].attribute_values[Spl_incline[i]]), epsilon.g3);
 					element_pow_mpz(ts.K13[i], ts.K13[i], t);	// K1,3,i
 				}else{
-					S.H_2_(ts.K03[i], attributes[j].attribute_values[S_incline[i]], strlen(attributes[j].attribute_values[S_incline[i]]), epsilon.g3);
-					element_pow_mpz(ts.K03[i], ts.K03[i], t);	// K0,3,i
 					S.H_2_(ts.K03[i], attributes[j].attribute_values[Spl_incline[i]], strlen(attributes[j].attribute_values[Spl_incline[i]]), epsilon.g2);
+					element_pow_mpz(ts.K03[i], ts.K03[i], t);	// K0,3,i
+					S.H_2_(ts.K13[i], attributes[j].attribute_values[S_incline[i]], strlen(attributes[j].attribute_values[S_incline[i]]), epsilon.g3);
 					element_pow_mpz(ts.K13[i], ts.K13[i], t);	// K1,3,i
 				}
 				break;
