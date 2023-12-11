@@ -69,6 +69,7 @@ void test(PUB_INFO epsilon, CIPHERTEXT C, TRAPDOOR ts) {
 	  element_mul(pi_X_omega, pi_X_omega, X_omega);
 	  element_mul(pi_K_omega, pi_K_omega, K_omega);
 	}
+
 	element_pairing(e_X_omega_K, pi_X_omega, *Kj2[j]);
 	element_invert(Kj1_inverse, *Kj1[j]);
 	element_mul(pi_K_omega, pi_K_omega, Kj1_inverse);
@@ -78,9 +79,10 @@ void test(PUB_INFO epsilon, CIPHERTEXT C, TRAPDOOR ts) {
 	size_t len = element_length_in_bytes(Ej);
 	char* Ej_Str = (char*)malloc(sizeof(char) * len);
 	element_to_bytes(Ej_Str, Ej);
+	Ej_Str[len-1] = '\0';
 	unsigned char* tmpStr;
 	epsilon.H(&tmpStr, Ej_Str, len, mpz_get_ui(epsilon.gamma));
-	if (memcmp(tmpStr, C.V1, mpz_get_ui(epsilon.gamma)) == 0) {
+	if(memcmp(tmpStr, C.V1, mpz_get_ui(epsilon.gamma) / 8) == 0) {
 	  C_prime.VALID = 1;
 	  b = j;
 	  break;

@@ -35,6 +35,7 @@ int main(void) {
   puts("Run setup");
   setup(lambda);
   puts("Run enc");
+  printf("Encrypted Message: %s\n", message);
   enc(epsilon, message, A, T);
   ATTRIBUTESET aSet;
   for(int i = 0; i < 2; ++i) {
@@ -42,20 +43,24 @@ int main(void) {
 	aSet.IS = IS[i];
 	aSet.LS = LS[i];
 	aSet.setSize = 3;
+
 	puts("Run trapgen");
 	trapgen(epsilon, S, aSet);
+
 	puts("Run test");
 	test(epsilon, C, ts);
-  char* plaintext;
+
 	if(!C_prime.VALID) {
 	  puts("Perp");
 	} else {
 	  puts("Run test2");
 	  if(!test2(epsilon, delta, C_prime)) {
-		puts("False positive");
+		puts("False positive or fake attribute");
 	  } else {
-		puts("Run Dec:");
-		Dec(epsilon, symmetric_key, C_prime, plaintext);
+		puts("Run Dec");
+		char* decrptyedMessage = (char*)malloc(sizeof(char) * 1024);
+		Dec(epsilon, symmetric_key, C_prime, decrptyedMessage);
+		printf("Decrypted Message: %s\n", decrptyedMessage);
 	  }
 	}
   }

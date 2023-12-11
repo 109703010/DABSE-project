@@ -48,7 +48,7 @@ void pub_info_H(unsigned char** hash, char* input_str, int input_size, int outpu
     // 计算SHA-256哈希值
     SHA256_Final(sha256_hash, &sha256);
     // 截断SHA-256哈希值到所需长度
-    memcpy(*hash, sha256_hash, output_size);
+    memcpy(*hash, sha256_hash, output_size/8);
     // 打印哈希值的十六进制表示
 }
 
@@ -109,9 +109,9 @@ void setup(mpz_t lambda) {
 
     mpz_init(epsilon.N);
     mpz_init(tmp);
-    mpz_init_set_ui(p1, 941083987);
-    mpz_init_set_ui(p2, 573259433);
-    mpz_init_set_ui(p3, 334214467);
+	mpz_init_set_ui(p1, 941083987);
+	mpz_init_set_ui(p2, 573259433);
+	mpz_init_set_ui(p3, 334214467);
     // mpz_init_set_ui(p1, 139);
     // mpz_init_set_ui(p2, 139);
     // mpz_init_set_ui(p3, 139);
