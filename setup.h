@@ -48,11 +48,25 @@ void pub_info_H(unsigned char** hash, char* input_str, int input_size, int outpu
     // 计算SHA-256哈希值
     SHA256_Final(sha256_hash, &sha256);
     // 截断SHA-256哈希值到所需长度
-    memcpy(*hash, sha256_hash, output_size);
+    memcpy(*hash, sha256_hash, output_size / 8);
     // 打印哈希值的十六进制表示
 }
 
 #pragma GCC diagnostic pop
+
+unsigned long int jenkins_one_at_a_time_hash(const char* key, size_t length) {
+    size_t i = 0;
+    unsigned long int hash = 0;
+    while (i != length) {
+        hash += key[i++];
+        hash += hash << 10;
+        hash ^= hash >> 6;
+    }
+    hash += hash << 3;
+    hash ^= hash >> 11;
+    hash += hash << 15;
+    return hash;
+}
 
 /// @brief {0,1}∗ → G_p2
 /// @param hash: output
@@ -61,10 +75,10 @@ void pub_info_H(unsigned char** hash, char* input_str, int input_size, int outpu
 /// @param g: generator of G_p2
 void secret_H_2_(element_t hash, char* input_str, int input_size, element_t g) {
     mpz_t exp;
-    mpz_init_set_ui(exp, 59305);
+    unsigned long int hash_val = jenkins_one_at_a_time_hash(input_str, input_size);
+    mpz_init_set_ui(exp, hash_val);
     element_init_same_as(hash, g);
     element_pow_mpz(hash, g, exp);
-    element_from_hash(hash, input_str, input_size);
     mpz_clear(exp);
 }
 
@@ -83,7 +97,6 @@ void pub_info_H_2(element_t hash, char* input_str, int input_size, element_t g_1
     secret_H_2_(hash, input_str, input_size, g_2);
     element_mul(hash, R, hash);
     mpz_clear(exp);
-    // element_free(R);
 }
 
 /// @brief pub info: epsilon and secret: S are global variables

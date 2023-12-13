@@ -3,30 +3,35 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <gmp.h>
+#include <pbc/pbc.h>
 #include <openssl/conf.h>
 #include <openssl/evp.h>
 #include <openssl/err.h>
+#include "../setup.h"
 
-/*#define DEBUG = 1*/
+//#define DEBUG = 1
 
 unsigned char iv[EVP_MAX_IV_LENGTH] = "0123456789012345"; // 16字节IV
 
 // 加密函数
 int SEnc(const unsigned char *plaintext, int plaintext_len,
-	mpz_t k, unsigned char *ciphertext);
+	element_t k, unsigned char *ciphertext);
 
 // 解密函数
 int SDec(const unsigned char *ciphertext, int ciphertext_len,
-	mpz_t k, unsigned char *plaintext);
+	element_t k, unsigned char *plaintext);
 
 #if defined(DEBUG)
 int main() {
   // 明文
   unsigned char plaintext[] = "Hello, world!";
   int plaintext_len = strlen((char *)plaintext);
-  mpz_t k;
-  mpz_init_set_ui(k, 9861321);
+  mpz_t lambda;
+  mpz_init_set_ui(lambda, 256);
+  setup(lambda);
+  element_t k;
+  element_init_GT(k, epsilon.pairing_of_G);
+  element_random(k);
 
   // 分配足够的内存来存储密文
   unsigned char ciphertext[plaintext_len + EVP_MAX_BLOCK_LENGTH];
@@ -66,11 +71,18 @@ int main() {
 #endif
 
 int SEnc(const unsigned char *plaintext, int plaintext_len,
-	mpz_t k, unsigned char *ciphertext) {
+	element_t k, unsigned char *ciphertext) {
   EVP_CIPHER_CTX *ctx;
   // 密钥和初始化向量（IV）
-  unsigned char key[EVP_MAX_KEY_LENGTH] = "01234567890123456789012345678901"; // 32字节密钥
-  mpz_get_str(key, 10, k);
+  size_t n = element_length_in_bytes(k);
+  unsigned char* buffer = (unsigned char*)malloc(n);
+  element_to_bytes(buffer, k);
+
+  // 將位元組表示轉換為字串
+  char* key = (char*)malloc(n * 2 + 1);
+  for (size_t i = 0; i < n; i++) {
+	  sprintf(&key[i*2], "%02x", buffer[i]);
+  }
 
   int len;
   int ciphertext_len;
@@ -108,10 +120,17 @@ int SEnc(const unsigned char *plaintext, int plaintext_len,
 
 // 解密函数
 int SDec(const unsigned char *ciphertext, int ciphertext_len,
-   	mpz_t k, unsigned char *plaintext) {
+	element_t k, unsigned char *plaintext) {
   EVP_CIPHER_CTX *ctx;
-  unsigned char key[EVP_MAX_KEY_LENGTH] = "01234567890123456789012345678901"; // 32字节密钥
-  mpz_get_str(key, 10, k);
+  size_t n = element_length_in_bytes(k);
+  unsigned char* buffer = (unsigned char*)malloc(n);
+  element_to_bytes(buffer, k);
+
+  // 將位元組表示轉換為字串
+  char* key = (char*)malloc(n * 2 + 1);
+  for (size_t i = 0; i < n; i++) {
+	  sprintf(&key[i*2], "%02x", buffer[i]);
+  }
 
   int len;
   int plaintext_len;

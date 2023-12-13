@@ -44,7 +44,8 @@ void trapgen(PUB_INFO epsilon, SECRET S, ATTRIBUTESET attrSet){
 	int S_incline[attrSet.setSize];
 	ts.K03 = realloc(ts.K03, attrSet.setSize * sizeof(element_t));
 	ts.K13 = realloc(ts.K13, attrSet.setSize * sizeof(element_t));
-	ts.IS = realloc(attrSet.IS, attrSet.setSize * sizeof(char*));
+	ts.IS = malloc(attrSet.setSize * sizeof(char*));
+	memcpy(ts.IS, attrSet.IS, attrSet.setSize * sizeof(char*));
 	ts.ISSize = attrSet.setSize;
 
 	for(int i=0; i<attrSet.setSize; ++i){
@@ -93,7 +94,13 @@ void trapgen(PUB_INFO epsilon, SECRET S, ATTRIBUTESET attrSet){
 	// L'
 	int Spl_incline[attrSet.setSize];
 	for(int i=0; i<attrSet.setSize; ++i){
-		Spl_incline[i] = S_incline[i] + (rand() % attributes[i].num_values);
+		for(int j=0; j<numattributes; ++j){
+			if(strcmp(attrSet.IS[i], attributes[j].attribute_name) == 0){
+				Spl_incline[i] = S_incline[i] + (rand() % attributes[j].num_values);
+				Spl_incline[i] = Spl_incline[i] % attributes[j].num_values;
+				break;
+			}
+		}
 	}
 
 	// for calculate
@@ -118,16 +125,22 @@ void trapgen(PUB_INFO epsilon, SECRET S, ATTRIBUTESET attrSet){
 		element_init_G1(ts.K03[i], epsilon.pairing_of_G);
 	    element_init_G1(ts.K13[i], epsilon.pairing_of_G);
 		ts.IS[i] = strdup(attrSet.IS[i]);
-		if(delta.b == 0){
-			S.H_2_(ts.K03[i], attributes[i].attribute_values[S_incline[i]], strlen(attributes[i].attribute_values[S_incline[i]]), epsilon.g2);
-			element_pow_mpz(ts.K03[i], ts.K03[i], t);	// K0,3,i
-			S.H_2_(ts.K13[i], attributes[i].attribute_values[Spl_incline[i]], strlen(attributes[i].attribute_values[Spl_incline[i]]), epsilon.g3);
-			element_pow_mpz(ts.K13[i], ts.K13[i], t);	// K1,3,i
-		}else{
-			S.H_2_(ts.K03[i], attributes[i].attribute_values[S_incline[i]], strlen(attributes[i].attribute_values[S_incline[i]]), epsilon.g3);
-			element_pow_mpz(ts.K03[i], ts.K03[i], t);	// K0,3,i
-			S.H_2_(ts.K03[i], attributes[i].attribute_values[Spl_incline[i]], strlen(attributes[i].attribute_values[Spl_incline[i]]), epsilon.g2);
-			element_pow_mpz(ts.K13[i], ts.K13[i], t);	// K1,3,i
+		for(int j=0; j<numattributes; ++j){
+			if(strcmp(attrSet.IS[i], attributes[j].attribute_name) == 0){
+				if(delta.b == 0){
+					//printf("attribute value: %s %s\n", attrSet.LS[i], attributes[j].attribute_values[S_incline[i]]);
+					S.H_2_(ts.K03[i], attributes[j].attribute_values[S_incline[i]], strlen(attributes[j].attribute_values[S_incline[i]]), epsilon.g2);
+					element_pow_mpz(ts.K03[i], ts.K03[i], t);	// K0,3,i
+					S.H_2_(ts.K13[i], attributes[j].attribute_values[Spl_incline[i]], strlen(attributes[j].attribute_values[Spl_incline[i]]), epsilon.g3);
+					element_pow_mpz(ts.K13[i], ts.K13[i], t);	// K1,3,i
+				}else{
+					S.H_2_(ts.K03[i], attributes[j].attribute_values[Spl_incline[i]], strlen(attributes[j].attribute_values[Spl_incline[i]]), epsilon.g2);
+					element_pow_mpz(ts.K03[i], ts.K03[i], t);	// K0,3,i
+					S.H_2_(ts.K13[i], attributes[j].attribute_values[S_incline[i]], strlen(attributes[j].attribute_values[S_incline[i]]), epsilon.g3);
+					element_pow_mpz(ts.K13[i], ts.K13[i], t);	// K1,3,i
+				}
+				break;
+			}
 		}
 	}
     element_init_G1(ts.K04, epsilon.pairing_of_G);

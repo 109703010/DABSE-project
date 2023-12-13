@@ -11,16 +11,18 @@ typedef struct AttributeSet {
 } ATTRIBUTESET;
 
 void setAttributeSet(ATTRIBUTESET* attrSet) {
-    char name[100];
-    char feature[100];
+    char *name = malloc(100);
+    char *feature = malloc(100);
     while (1) {
         printf("請輸入attribute name（輸入 quit 結束）：\n");
         fgets(name, 100, stdin);
+        name = strtok(name, "\n");
         if (strcmp(name, "quit") == 0) {
             break;
         }
         printf("請輸入 %s 的attribute value：", name);
         fgets(feature, 100, stdin);
+        feature = strtok(feature, "\n");
 
         attrSet->setSize++;
         attrSet->IS = realloc(attrSet->IS, attrSet->setSize * sizeof(char*));

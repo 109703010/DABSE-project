@@ -1,13 +1,13 @@
 #ifndef TEST_H
 #define TEST_H
-#include "setup.h"
+#include "attribute/Attribute.h"
 #include "enc.h"
 #include "policy/getOmega.h"
-#include "trapgen.c"
-#include "attribute/Attribute.h"
+#include "setup.h"
+#include "trapgen.h"
 
 typedef struct {
-  int VALID; // 0 implies perp
+  int VALID;  // 0 implies perp
   char* K;
   element_t W;
   element_t Z;
@@ -21,17 +21,22 @@ void test(PUB_INFO epsilon, CIPHERTEXT C, TRAPDOOR ts) {
   char* IS = AttributeNameConversion(ts.IS, ts.ISSize);
   int* A_prime[C.A.l];
   int l_prime = 0;
-  for(int i = 0; i < C.A.l; ++i) {
-	for(int j = 0; j < ts.ISSize; ++j) {
-	  if(IS[j] == C.A.rho[i]) {
-		A_prime[l_prime++] = C.A.M[i];
+  int originRowTable[C.A.l];
+  int row2orderTable[C.A.l];
+  for (int i = 0; i < C.A.l; ++i) {
+	for (int j = 0; j < ts.ISSize; ++j) {
+	  if (IS[j] == C.A.rho[i]) {
+		A_prime[l_prime] = C.A.M[i];
+		originRowTable[l_prime] = i;
+		row2orderTable[l_prime++] = j;
 		break;
 	  }
 	}
   }
+  free(IS);
   int* row = get_indepedent_row(A_prime, l_prime, C.A.n);
   int* omega = get_omega(A_prime, row, C.A.n);
-  if(!isValidOmega(omega)) {
+  if (!isValidOmega(omega)) {
 	return;
   }
   element_t* Kj1[2] = {&ts.K01, &ts.K11};
@@ -53,29 +58,31 @@ void test(PUB_INFO epsilon, CIPHERTEXT C, TRAPDOOR ts) {
   element_init_GT(e_Z_K_K, epsilon.pairing_of_G);
   element_init_GT(Ej, epsilon.pairing_of_G);
   int b;
-  for(int j = 0; j < 2; ++j) {
-	element_init_GT(Ej, epsilon.pairing_of_G);
+  
+  for (int j = 0; j < 2; ++j) {
 	element_set1(pi_X_omega);
 	element_set1(pi_K_omega);
-	for(int i = 0; i < row[0]; ++i) {
+	for (int i = 1; i <= row[0]; ++i) {
 	  mpz_set_si(omega_i, omega[row[i]]);
-	  element_pow_mpz(X_omega, C.X[row[i]], omega_i);
-	  element_pow_mpz(K_omega, Kj3[j][row[i]], omega_i);
+	  element_pow_mpz(X_omega, C.X[originRowTable[row[i]]], omega_i);
+	  element_pow_mpz(K_omega, Kj3[j][row2orderTable[row[i]]], omega_i);
 	  element_mul(pi_X_omega, pi_X_omega, X_omega);
 	  element_mul(pi_K_omega, pi_K_omega, K_omega);
 	}
+
 	element_pairing(e_X_omega_K, pi_X_omega, *Kj2[j]);
 	element_invert(Kj1_inverse, *Kj1[j]);
 	element_mul(pi_K_omega, pi_K_omega, Kj1_inverse);
 	element_pairing(e_Z_K_K, *Zj[j], pi_K_omega);
-	element_mul(Ej, *Cj[j], e_X_omega_K);
-	element_mul(Ej, Ej, e_Z_K_K);
+	element_mul(Ej, e_X_omega_K, e_Z_K_K);
+	element_mul(Ej, Ej, *Cj[j]);
 	size_t len = element_length_in_bytes(Ej);
 	char* Ej_Str = (char*)malloc(sizeof(char) * len);
 	element_to_bytes(Ej_Str, Ej);
+	Ej_Str[len-1] = '\0';
 	unsigned char* tmpStr;
-	epsilon.H(&tmpStr, Ej_Str, len, 256);
-	if(memcmp(tmpStr, C.V1, 256) == 0) {
+	epsilon.H(&tmpStr, Ej_Str, len, mpz_get_ui(epsilon.gamma));
+	if(memcmp(tmpStr, C.V1, mpz_get_ui(epsilon.gamma) / 8) == 0) {
 	  C_prime.VALID = 1;
 	  b = j;
 	  break;
@@ -88,7 +95,7 @@ void test(PUB_INFO epsilon, CIPHERTEXT C, TRAPDOOR ts) {
   element_clear(e_X_omega_K);
   element_clear(pi_X_omega);
   element_clear(X_omega);
-  if(!C_prime.VALID) {
+  if (!C_prime.VALID) {
 	element_clear(Ej);
 	return;
   }
@@ -102,7 +109,7 @@ void test(PUB_INFO epsilon, CIPHERTEXT C, TRAPDOOR ts) {
   gmp_randclear(state);
 
   C_prime.K = strdup(C.K);
-  
+
   element_t* Kb4[2] = {&ts.K14, &ts.K04};
   element_t* Kb5[2] = {&ts.K15, &ts.K05};
   element_t e_g_g_beta_mu_s_prime;
@@ -119,7 +126,7 @@ void test(PUB_INFO epsilon, CIPHERTEXT C, TRAPDOOR ts) {
   element_pow_mpz(C_prime.Z, *gb[b], s_prime);
   element_mul(C_prime.Z, C_prime.Z, *Zj[b]);
   mpz_clear(s_prime);
-  
+
   C_prime.V = (unsigned char*)malloc(sizeof(unsigned char) * mpz_get_ui(epsilon.gamma));
   memcpy(C_prime.V, C.V2, mpz_get_ui(epsilon.gamma));
 }
